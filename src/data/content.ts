@@ -373,5 +373,8 @@ export const footer = {
   },
   navTitle: { zh: '快速导航', en: 'Quick Links' },
   contactTitle: { zh: '联系方式', en: 'Contact' },
-  copyright: '© 2026 金华莱盟纺织品有限公司 Jinhua Laimeng Textile Factory. All rights reserved.',
+  copyright: {
+    zh: `© 2020–${new Date().getFullYear()} 金华莱盟纺织品有限公司 版权所有。`,
+    en: `© 2020–${new Date().getFullYear()} Jinhua Laimeng Textile Factory. All rights reserved.`,
+  },
 };
