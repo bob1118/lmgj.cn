@@ -1,0 +1,5 @@
+# lmgj.cn robots.txt - allow all crawlers
+User-agent: *
+Allow: /
+
+Sitemap: https://lmgj.cn/sitemap-index.xml
