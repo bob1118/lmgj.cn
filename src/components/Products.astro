@@ -1,0 +1,132 @@
+---
+import { Image } from 'astro:assets';
+import { products } from '../data/content';
+import { assetImage, toLightboxImages } from '../lib/images';
+---
+
+<section class="products" id="products">
+  <div class="container">
+    <div class="section-head">
+      <span class="kicker">
+        <span class="i18n-zh" lang="zh-CN">产品分类</span>
+        <span class="i18n-en" lang="en">Categories</span>
+      </span>
+      <h2>
+        <span class="i18n-zh" lang="zh-CN">{products.title.zh}</span>
+        <span class="i18n-en" lang="en">{products.title.en}</span>
+      </h2>
+      <div class="products-head-extra">
+        <p>
+          <span class="i18n-zh" lang="zh-CN">{products.intro.zh}</span>
+          <span class="i18n-en" lang="en">{products.intro.en}</span>
+        </p>
+      </div>
+    </div>
+
+    {
+      products.categories.map((cat) => (
+        <div class:list={['category', cat.id]}>
+          <div class="category-banner">
+            <div>
+              <div class="cat-name">
+                <span class="i18n-zh" lang="zh-CN">{cat.name.zh}</span>
+                <span class="i18n-en" lang="en">{cat.name.en}</span>
+              </div>
+              <p class="cat-desc">
+                <span class="i18n-zh" lang="zh-CN">{cat.desc.zh}</span>
+                <span class="i18n-en" lang="en">{cat.desc.en}</span>
+              </p>
+            </div>
+            {cat.id === 'knitted' ? (
+              <svg class="knit-pattern" viewBox="0 0 96 56" aria-hidden="true">
+                <rect width="96" height="56" fill="url(#patt-knit)" />
+              </svg>
+            ) : (
+              <svg class="woven-pattern" viewBox="0 0 96 56" aria-hidden="true">
+                <rect width="96" height="56" fill="url(#patt-woven-light)" />
+              </svg>
+            )}
+          </div>
+
+          <div class="product-grid">
+            {cat.items.map((item, i) => {
+              const main = item.images?.[0];
+              const lb = toLightboxImages(item.images);
+              const count = lb.length;
+              return (
+                <article class="product-card">
+                  <div class="thumb">
+                    {main ? (
+                      <a
+                        class="thumb-main"
+                        href={lb[0]?.src ?? main.src}
+                        title={lb[0]?.alt}
+                        data-lb-images={JSON.stringify(lb)}
+                        data-lb-index="0"
+                      >
+                        <Image
+                          src={assetImage(main.src)}
+                          alt={lb[0]?.altZh ?? ''}
+                          data-alt-zh={lb[0]?.altZh}
+                          data-alt-en={lb[0]?.altEn}
+                          width={640}
+                          height={320}
+                          widths={[480, 640, 960]}
+                          sizes="(max-width: 860px) 100vw, 340px"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </a>
+                    ) : (
+                      <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                        {cat.id === 'knitted' ? (
+                          <>
+                            <rect width="300" height="150" fill={['#1d4a6b', '#255a7d', '#163a55'][i]} />
+                            <rect width="300" height="150" fill="url(#patt-knit)" />
+                          </>
+                        ) : (
+                          <>
+                            <rect width="300" height="150" fill={['#e7ddc8', '#dfcfae', '#d5c9ac'][i]} />
+                            <rect width="300" height="150" fill="url(#patt-woven)" />
+                          </>
+                        )}
+                      </svg>
+                    )}
+                    {count > 1 && (
+                      <span class="count-badge">
+                        <span class="i18n-zh" lang="zh-CN">{count} 图</span>
+                        <span class="i18n-en" lang="en">{count} Photos</span>
+                      </span>
+                    )}
+                    <span class="spec-chip">{item.spec}</span>
+                  </div>
+                  <div class="card-body">
+                    <h3>
+                      <span class="i18n-zh" lang="zh-CN">{item.name.zh}</span>
+                      <span class="i18n-en" lang="en">{item.name.en}</span>
+                    </h3>
+                    <p>
+                      <span class="i18n-zh" lang="zh-CN">{item.desc.zh}</span>
+                      <span class="i18n-en" lang="en">{item.desc.en}</span>
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      ))
+    }
+
+    <div class="products-cta">
+      <span class="lead">
+        <span class="i18n-zh" lang="zh-CN">{products.contactLead.zh}</span>
+        <span class="i18n-en" lang="en">{products.contactLead.en}</span>
+      </span>
+      <a class="btn btn-primary" href="#contact">
+        <span class="i18n-zh" lang="zh-CN">{products.contactCta.zh}</span>
+        <span class="i18n-en" lang="en">{products.contactCta.en}</span>
+      </a>
+    </div>
+  </div>
+</section>

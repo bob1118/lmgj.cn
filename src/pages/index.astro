@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Products from '../components/Products.astro';
+import Strength from '../components/Strength.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+
+const title = '金华莱盟纺织品有限公司 — 针织与织造纺织品进出口 | Jinhua Laimeng Textile Factory';
+const titleEn = 'Jinhua Laimeng Textile Factory — Knitted & Woven Textiles Import & Export';
+const description =
+  '金华莱盟纺织品有限公司（Jinhua Laimeng Textile Factory）专注针织与织造纺织品进出口贸易，为国内外采购商提供面料选料、打样到大货交付的一站式服务。Knitted & woven textiles import and export — sourcing, sampling and bulk delivery for buyers worldwide.';
+const descriptionEn =
+  'Jinhua Laimeng Textile Factory specializes in knitted and woven textile import & export — one-stop service from sourcing, sampling to bulk delivery for buyers worldwide. 金华莱盟纺织品有限公司专注针织与织造纺织品进出口贸易。';
+---
+<Layout title={title} description={description} titleEn={titleEn} descriptionEn={descriptionEn}>
+  <Header />
+  <main id="main">
+    <Hero />
+    <About />
+    <div class="weave-divider" aria-hidden="true"></div>
+    <Products />
+    <Strength />
+    <div class="weave-divider" aria-hidden="true"></div>
+    <Contact />
+  </main>
+  <Footer />
+</Layout>

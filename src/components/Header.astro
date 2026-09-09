@@ -1,0 +1,68 @@
+---
+import { nav, site } from '../data/content';
+import logo from '../assets/logo.png';
+---
+
+<a class="skip-link" href="#main"><span class="i18n-zh" lang="zh-CN">跳到主要内容</span><span class="i18n-en" lang="en">Skip to content</span></a>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="#home" aria-label={site.nameZh + ' ' + site.nameEn}>
+      <img src={logo.src} alt={site.nameZh + ' ' + site.nameEn + ' logo'} width="38" height="38" />
+      <span class="brand-name">
+        <span class="i18n-zh" lang="zh-CN">{site.nameZh}</span>
+        <span class="i18n-en" lang="en">{site.nameEn}</span>
+        <span class="brand-sub">lmgj.cn</span>
+      </span>
+    </a>
+
+    <nav class="site-nav" id="site-nav" aria-label="主导航 Main navigation">
+      {
+        nav.map((item, i) => (
+          <a href={`#${item.id}`} aria-current={i === 0 ? 'true' : undefined}>
+            <span class="i18n-zh" lang="zh-CN">{item.label.zh}</span>
+            <span class="i18n-en" lang="en">{item.label.en}</span>
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="header-tools">
+      <button class="lang-toggle" id="lang-toggle" type="button" aria-label="切换语言 Switch language">
+        <span class="i18n-zh" lang="zh-CN">EN</span>
+        <span class="i18n-en" lang="en">中文</span>
+      </button>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="打开菜单 Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .skip-link {
+    position: fixed;
+    top: -60px;
+    left: 16px;
+    z-index: 100;
+    background: var(--brand-ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    transition: top 0.2s ease;
+  }
+  .skip-link:focus-visible {
+    top: 12px;
+  }
+
+  /* 企业全称较长：小屏收紧品牌字号并隐藏副标 */
+  @media (max-width: 560px) {
+    .brand-name {
+      font-size: 0.82rem;
+    }
+    .brand-sub {
+      display: none;
+    }
+  }
+</style>

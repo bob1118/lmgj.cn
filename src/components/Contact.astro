@@ -1,0 +1,86 @@
+---
+import { contact } from '../data/content';
+
+const email = contact.channels.find((c) => c.key === 'email');
+
+const icons: Record<string, string> = {
+  email:
+    '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+  phone:
+    '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+};
+---
+
+<section class="contact" id="contact">
+  <div class="container">
+    <div class="section-head">
+      <span class="kicker">
+        <span class="i18n-zh" lang="zh-CN">期待与您合作</span>
+        <span class="i18n-en" lang="en">Get in Touch</span>
+      </span>
+      <h2>
+        <span class="i18n-zh" lang="zh-CN">{contact.title.zh}</span>
+        <span class="i18n-en" lang="en">{contact.title.en}</span>
+      </h2>
+      <div class="products-head-extra">
+        <p>
+          <span class="i18n-zh" lang="zh-CN">{contact.intro.zh}</span>
+          <span class="i18n-en" lang="en">{contact.intro.en}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="contact-grid">
+      <div class="channel-list">
+        {
+          contact.channels.map((ch) => (
+            <a class="channel" href={ch.href}>
+              <span class="icon" aria-hidden="true" set:html={icons[ch.key]} />
+              <span class="meta">
+                <span class="label">
+                  <span class="i18n-zh" lang="zh-CN">{ch.label.zh}</span>
+                  <span class="i18n-en" lang="en">{ch.label.en}</span>
+                </span>
+                <span class="value">{ch.value}</span>
+              </span>
+            </a>
+          ))
+        }
+        <div class="channel">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+          </span>
+          <span class="meta">
+            <span class="label">
+              <span class="i18n-zh" lang="zh-CN">{contact.address.label.zh}</span>
+              <span class="i18n-en" lang="en">{contact.address.label.en}</span>
+            </span>
+            <span class="value">
+              <span class="i18n-zh" lang="zh-CN">{contact.address.value.zh}</span>
+              <span class="i18n-en" lang="en">{contact.address.value.en}</span>
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <aside class="contact-aside">
+        <h3>
+          <span class="i18n-zh" lang="zh-CN">立即开启合作</span>
+          <span class="i18n-en" lang="en">Start a Conversation</span>
+        </h3>
+        <p>
+          <span class="i18n-zh" lang="zh-CN">告诉我们您需要的品类、规格与数量，我们将在一个工作日内回复报价与打样方案。</span>
+          <span class="i18n-en" lang="en">Tell us the category, specification and quantity you need — we will respond with a quotation and sampling plan within one business day.</span>
+        </p>
+        <a class="btn" href={email?.href}>
+          <span class="i18n-zh" lang="zh-CN">{contact.cta.zh}</span>
+          <span class="i18n-en" lang="en">{contact.cta.en}</span>
+        </a>
+        <p class="reply-hint">
+          <span class="i18n-zh" lang="zh-CN">工作日 9:00–18:00（GMT+8）</span>
+          <span class="i18n-en" lang="en">Business days 9:00–18:00 (GMT+8)</span>
+        </p>
+      </aside>
+    </div>
+  </div>
+</section>

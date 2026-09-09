@@ -1,0 +1,99 @@
+---
+import { Image } from 'astro:assets';
+import { about } from '../data/content';
+import workshop from '../assets/company/workshop.jpg';
+
+// 核心优势图标（内联 SVG，与内容分离）
+const icons: string[] = [
+  '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M11 5l1-1a4 4 0 0 1 6 6l-1 1"/><path d="M13 19l-1 1a4 4 0 0 1-6-6l1-1"/></svg>',
+  '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>',
+  '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M9 13.5L7 21l5-2.4L17 21l-2-7.5"/></svg>',
+  '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>',
+];
+---
+
+<section class="about" id="about">
+  <div class="container">
+    <div class="section-head">
+      <span class="kicker">
+        <span class="i18n-zh" lang="zh-CN">公司简介</span>
+        <span class="i18n-en" lang="en">Company Profile</span>
+      </span>
+      <h2>
+        <span class="i18n-zh" lang="zh-CN">{about.title.zh}</span>
+        <span class="i18n-en" lang="en">{about.title.en}</span>
+      </h2>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-copy">
+        <p><strong>
+          <span class="i18n-zh" lang="zh-CN">{about.lead.zh}</span>
+          <span class="i18n-en" lang="en">{about.lead.en}</span>
+        </strong></p>
+        {/* 企业已确认文案 */}
+        <p>
+          <span class="i18n-zh" lang="zh-CN">{about.body.zh}</span>
+          <span class="i18n-en" lang="en">{about.body.en}</span>
+        </p>
+      </div>
+
+      {/* 车间实景图（企业提供，原织物纹样占位卡已替换） */}
+      <figure class="fabric-swatch">
+        <Image
+          src={workshop}
+          alt="织造车间生产实景"
+          data-alt-zh="织造车间生产实景"
+          data-alt-en="Weaving workshop in production"
+          widths={[480, 800, 1200]}
+          sizes="(max-width: 860px) 100vw, 420px"
+          quality={75}
+          loading="lazy"
+          decoding="async"
+          class="swatch-photo"
+        />
+        <figcaption class="swatch-caption">
+          <span class="i18n-zh" lang="zh-CN">织造车间 · 生产实景</span>
+          <span class="i18n-en" lang="en">Weaving workshop · On site</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="advantages">
+      <h2 class="visually-hidden">
+        <span class="i18n-zh" lang="zh-CN">{about.advantagesTitle.zh}</span>
+        <span class="i18n-en" lang="en">{about.advantagesTitle.en}</span>
+      </h2>
+      {
+        about.advantages.map((a, i) => (
+          <div class="advantage-card">
+            <div class="icon" aria-hidden="true" set:html={icons[i]} />
+            <h3>
+              <span class="i18n-zh" lang="zh-CN">{a.title.zh}</span>
+              <span class="i18n-en" lang="en">{a.title.en}</span>
+            </h3>
+            <p>
+              <span class="i18n-zh" lang="zh-CN">{a.desc.zh}</span>
+              <span class="i18n-en" lang="en">{a.desc.en}</span>
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .swatch-photo {
+    width: 100%;
+    height: auto;
+  }
+</style>

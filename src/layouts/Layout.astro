@@ -1,0 +1,426 @@
+---
+import '../styles/global.css';
+import { site, contact } from '../data/content';
+import logo from '../assets/logo.png';
+import favicon32 from '../assets/favicon-32.png';
+import appleTouchIcon from '../assets/apple-touch-icon.png';
+import ogImage from '../assets/og-image.jpg';
+
+// 构建产物为根相对路径（/_astro/*.png），SEO 需补全为绝对地址
+const logoAbsolute = site.url + logo.src;
+const ogImageAbsolute = site.url + ogImage.src;
+
+interface Props {
+  title: string;
+  description: string;
+  /** 英文语言的 title / description（缺省与中文一致，用于切语言时同步） */
+  titleEn?: string;
+  descriptionEn?: string;
+}
+
+const {
+  title,
+  description,
+  titleEn = title,
+  descriptionEn = description,
+} = Astro.props;
+
+const email = contact.channels.find((c) => c.key === 'email');
+const phone = contact.channels.find((c) => c.key === 'phone');
+
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.nameEn,
+  alternateName: site.nameZh,
+  url: site.url + '/',
+  logo: logoAbsolute,
+  contactPoint: [
+    {
+      '@type': 'ContactPoint',
+      contactType: 'sales',
+      ...(email ? { email: email.value } : {}),
+      ...(phone ? { telephone: phone.value.replace(/\s/g, '') } : {}),
+      availableLanguage: ['zh-CN', 'en'],
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="zh-CN" data-lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0e6a60" />
+    <title data-title-zh={title} data-title-en={titleEn}>{title}</title>
+    <meta
+      name="description"
+      content={description}
+      data-desc-zh={description}
+      data-desc-en={descriptionEn}
+    />
+    <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src} />
+    <link rel="apple-touch-icon" href={appleTouchIcon.src} />
+    <link rel="canonical" href={site.url + '/'} />
+    <meta name="generator" content={Astro.generator} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.nameEn} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={site.url + '/'} />
+    <meta property="og:image" content={ogImageAbsolute} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="金华莱盟纺织品有限公司 — 针织与织造纺织品 Jinhua Laimeng Textile Factory — Knitted & Woven Textiles"
+    />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
+
+    {/* 语言偏好预读取：首帧前生效，避免闪切（并同步标题/描述） */}
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') {
+            document.documentElement.dataset.lang = saved;
+            document.documentElement.lang = saved === 'zh' ? 'zh-CN' : 'en';
+            var t = document.querySelector('title');
+            var d = document.querySelector('meta[name="description"]');
+            var tk = saved === 'zh' ? 'titleZh' : 'titleEn';
+            var dk = saved === 'zh' ? 'descZh' : 'descEn';
+            if (t && t.dataset[tk]) document.title = t.dataset[tk];
+            if (d && d.dataset[dk]) d.setAttribute('content', d.dataset[dk]);
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+
+  <body>
+    <slot />
+
+    {/* 全站共享的织物纹样（SVG pattern），供各组件以 url(#id) 引用 */}
+    <svg class="svg-defs" aria-hidden="true" focusable="false">
+      <defs>
+        {/* 针织线圈纹 */}
+        <pattern id="patt-knit" width="16" height="14" patternUnits="userSpaceOnUse">
+          <path d="M0 2 L8 12 L16 2" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="2"></path>
+          <path d="M0 -5 L8 5 L16 -5" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="2"></path>
+          <path d="M0 9 L8 19 L16 9" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="2"></path>
+        </pattern>
+        {/* 平纹方格（深纹，用于浅底） */}
+        <pattern id="patt-woven" width="24" height="24" patternUnits="userSpaceOnUse">
+          <rect width="12" height="12" fill="rgba(6,47,43,0.10)"></rect>
+          <rect x="12" y="12" width="12" height="12" fill="rgba(6,47,43,0.10)"></rect>
+          <path d="M12 0 V24 M0 12 H24" stroke="rgba(6,47,43,0.08)" stroke-width="1"></path>
+        </pattern>
+        {/* 平纹方格（浅纹，用于深底） */}
+        <pattern id="patt-woven-light" width="24" height="24" patternUnits="userSpaceOnUse">
+          <rect width="12" height="12" fill="rgba(255,255,255,0.12)"></rect>
+          <rect x="12" y="12" width="12" height="12" fill="rgba(255,255,255,0.12)"></rect>
+        </pattern>
+        {/* 斜纹纹 */}
+        <pattern id="patt-twill" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <rect width="3" height="10" fill="rgba(255,255,255,0.10)"></rect>
+        </pattern>
+      </defs>
+    </svg>
+
+    <script>
+      // ---------- 语言同步辅助 ----------
+      const root = document.documentElement;
+      const currentLang = () => (root.dataset.lang === 'en' ? 'en' : 'zh');
+      const isZh = () => currentLang() === 'zh';
+
+      /** 切语言时同步页面标题与 meta description */
+      const applyPageMeta = (lang: string) => {
+        const t = document.querySelector<HTMLTitleElement>('title');
+        const d = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+        if (t) {
+          const v = lang === 'zh' ? t.dataset.titleZh : t.dataset.titleEn;
+          if (v) document.title = v;
+        }
+        if (d) {
+          const v = lang === 'zh' ? d.dataset.descZh : d.dataset.descEn;
+          if (v) d.setAttribute('content', v);
+        }
+      };
+
+      /** 切语言时同步图片 alt（data-alt-zh / data-alt-en） */
+      const applyImageAlts = (lang: string) => {
+        document.querySelectorAll<HTMLImageElement>('img[data-alt-zh]').forEach((img) => {
+          const alt = (lang === 'zh' ? img.dataset.altZh : img.dataset.altEn) ?? '';
+          if (alt) img.setAttribute('alt', alt);
+        });
+      };
+
+      applyPageMeta(currentLang());
+      applyImageAlts(currentLang());
+
+      // ---------- 图片灯箱 ----------
+      interface LbItem {
+        src: string;
+        /** 双语拼接（回退用） */
+        alt: string;
+        /** 单语言（按当前语言显示；由 data-lb-images 携带） */
+        altZh?: string;
+        altEn?: string;
+      }
+      const lbState: { items: LbItem[]; index: number; lastFocus: HTMLElement | null } = {
+        items: [],
+        index: 0,
+        lastFocus: null,
+      };
+      let lbEl: HTMLElement | null = null;
+      let lbImg: HTMLImageElement | null = null;
+      let lbCaption: HTMLElement | null = null;
+      let lbCount: HTMLElement | null = null;
+      let lbPrev: HTMLButtonElement | null = null;
+      let lbNext: HTMLButtonElement | null = null;
+      let lbClose: HTMLButtonElement | null = null;
+
+      const lbRender = () => {
+        if (!lbEl || !lbImg || !lbCount) return;
+        const item = lbState.items[lbState.index];
+        if (!item) return;
+        // 说明文字按当前语言显示，缺字段时回退双语串
+        const text = (isZh() ? item.altZh : item.altEn) || item.alt;
+        lbImg.src = item.src;
+        lbImg.alt = text;
+        if (lbCaption) lbCaption.textContent = text;
+        lbCount.textContent = `${lbState.index + 1} / ${lbState.items.length}`;
+        const single = lbState.items.length < 2;
+        if (lbPrev) lbPrev.hidden = single;
+        if (lbNext) lbNext.hidden = single;
+        if (lbCount) lbCount.hidden = single;
+        // aria 标签随当前语言更新
+        lbEl.setAttribute('aria-label', isZh() ? '图片浏览' : 'Image viewer');
+        if (lbClose) lbClose.setAttribute('aria-label', isZh() ? '关闭（Esc）' : 'Close (Esc)');
+        if (lbPrev) lbPrev.setAttribute('aria-label', isZh() ? '上一张' : 'Previous image');
+        if (lbNext) lbNext.setAttribute('aria-label', isZh() ? '下一张' : 'Next image');
+      };
+
+      const lbGo = (step: number) => {
+        const n = lbState.items.length;
+        if (!n) return;
+        lbState.index = (lbState.index + step + n) % n;
+        lbRender();
+      };
+
+      const lbCloseFn = () => {
+        if (!lbEl) return;
+        lbEl.hidden = true;
+        document.body.classList.remove('lb-open');
+        document.removeEventListener('keydown', lbOnKey);
+        lbState.lastFocus?.focus();
+        lbState.lastFocus = null;
+      };
+
+      const lbOnKey = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') lbCloseFn();
+        else if (e.key === 'ArrowLeft') lbGo(-1);
+        else if (e.key === 'ArrowRight') lbGo(1);
+        else if (e.key === 'Tab') {
+          // 焦点圈定：Tab / Shift+Tab 在灯箱按钮间循环，不逃逸到背景页
+          const focusables = [lbClose, lbPrev, lbNext].filter(
+            (b): b is HTMLButtonElement => !!b && !b.hidden
+          );
+          if (!focusables.length) return;
+          const idx = focusables.indexOf(document.activeElement as HTMLButtonElement);
+          const nextIdx = e.shiftKey
+            ? idx <= 0
+              ? focusables.length - 1
+              : idx - 1
+            : idx === -1 || idx === focusables.length - 1
+              ? 0
+              : idx + 1;
+          e.preventDefault();
+          focusables[nextIdx].focus();
+        }
+      };
+
+      const lbOpen = (items: LbItem[], index: number, trigger: HTMLElement) => {
+        if (!items.length) return;
+        if (!lbEl) lbBuild();
+        if (!lbEl) return;
+        lbState.items = items;
+        lbState.index = index;
+        lbState.lastFocus = trigger;
+        lbEl.hidden = false;
+        document.body.classList.add('lb-open');
+        lbRender();
+        lbClose?.focus();
+        document.addEventListener('keydown', lbOnKey);
+      };
+
+      const lbBuild = () => {
+        lbEl = document.createElement('div');
+        lbEl.className = 'lightbox';
+        lbEl.hidden = true;
+        lbEl.setAttribute('role', 'dialog');
+        lbEl.setAttribute('aria-modal', 'true');
+        lbEl.innerHTML =
+          '<button type="button" class="lb-btn lb-close" aria-label="关闭">' +
+          '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+          '</button>' +
+          '<button type="button" class="lb-btn lb-prev" aria-label="上一张">' +
+          '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>' +
+          '</button>' +
+          '<figure class="lb-stage"><img class="lb-img" alt=""><figcaption class="lb-caption"></figcaption></figure>' +
+          '<button type="button" class="lb-btn lb-next" aria-label="下一张">' +
+          '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>' +
+          '</button>' +
+          '<div class="lb-count" aria-hidden="true"></div>';
+        document.body.appendChild(lbEl);
+        lbImg = lbEl.querySelector('.lb-img');
+        lbCaption = lbEl.querySelector('.lb-caption');
+        lbCount = lbEl.querySelector('.lb-count');
+        lbPrev = lbEl.querySelector('.lb-prev');
+        lbNext = lbEl.querySelector('.lb-next');
+        lbClose = lbEl.querySelector('.lb-close');
+        lbClose?.addEventListener('click', lbCloseFn);
+        lbPrev?.addEventListener('click', () => lbGo(-1));
+        lbNext?.addEventListener('click', () => lbGo(1));
+        // 点击遮罩空白处关闭（点图片/按钮不关）
+        lbEl.addEventListener('click', (e) => {
+          if (e.target === lbEl) lbCloseFn();
+        });
+      };
+
+      // 事件委托：所有带 data-lb-images 的卡片统一进灯箱
+      document.addEventListener('click', (e) => {
+        const trigger = e.target instanceof Element ? e.target.closest<HTMLElement>('a[data-lb-images]') : null;
+        if (!trigger) return;
+        let items: LbItem[] = [];
+        try {
+          items = JSON.parse(trigger.dataset.lbImages ?? '[]');
+        } catch {
+          return;
+        }
+        if (!items.length) return; // 无数据时退化为默认链接行为
+        e.preventDefault();
+        lbOpen(items, Number(trigger.dataset.lbIndex ?? '0') || 0, trigger);
+      });
+
+      // ---------- 移动端菜单开合（含 Esc / 外部点击关闭） ----------
+      const navToggle = document.getElementById('nav-toggle');
+      const siteNav = document.getElementById('site-nav');
+      if (navToggle && siteNav) {
+        const navIsOpen = () => document.body.classList.contains('nav-open');
+        const close = () => {
+          document.body.classList.remove('nav-open');
+          navToggle.setAttribute('aria-expanded', 'false');
+        };
+        navToggle.addEventListener('click', () => {
+          const open = document.body.classList.toggle('nav-open');
+          navToggle.setAttribute('aria-expanded', String(open));
+        });
+        siteNav.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+        // 点击菜单与按钮以外的区域收起
+        document.addEventListener('click', (e) => {
+          if (!navIsOpen()) return;
+          const t = e.target instanceof Node ? e.target : null;
+          if (t && !siteNav.contains(t) && !navToggle.contains(t)) close();
+        });
+        // Esc 收起并把焦点还给汉堡按钮
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && navIsOpen()) {
+            close();
+            navToggle.focus();
+          }
+        });
+      }
+
+      // ---------- 语言切换 ----------
+      const langBtn = document.getElementById('lang-toggle');
+      if (langBtn) {
+        langBtn.addEventListener('click', () => {
+          const next = currentLang() === 'en' ? 'zh' : 'en';
+          root.dataset.lang = next;
+          root.lang = next === 'zh' ? 'zh-CN' : 'en';
+          applyPageMeta(next);
+          applyImageAlts(next);
+          // 灯箱开着时同步其文案
+          if (lbEl && !lbEl.hidden) lbRender();
+          try {
+            localStorage.setItem('lang', next);
+          } catch {}
+        });
+      }
+
+      // ---------- 首屏统计数字滚动计数 ----------
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const counters = Array.from(document.querySelectorAll<HTMLElement>('[data-count-to]'));
+      if (counters.length) {
+        const setCount = (el: HTMLElement, value: number) => {
+          const numEl = el.querySelector<HTMLElement>('.num') ?? el;
+          numEl.textContent = String(value);
+        };
+        const animateCount = (el: HTMLElement) => {
+          const target = Number(el.dataset.countTo ?? '0');
+          const duration = 2000; // 放慢节奏，数字增长更沉稳
+          const start = performance.now();
+          const tick = (now: number) => {
+            const t = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic：先快后慢收尾
+            setCount(el, Math.round(target * eased));
+            if (t < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        };
+        if (reducedMotion.matches) {
+          // 减少动态模式：跳过动画直接显示终值
+          counters.forEach((el) => setCount(el, Number(el.dataset.countTo ?? '0')));
+        } else {
+          const io = new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+                io.unobserve(entry.target);
+                animateCount(entry.target as HTMLElement);
+              }
+            },
+            { threshold: 0.4 }
+          );
+          counters.forEach((el) => io.observe(el));
+        }
+      }
+
+      // ---------- 滚动时高亮当前区块对应的导航项 ----------
+      const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.site-nav a[href^="#"]'));
+      const sections = links
+        .map((link) => document.getElementById((link.getAttribute('href') ?? '').slice(1)))
+        .filter((el): el is HTMLElement => el !== null);
+      const setCurrent = (id: string) => {
+        links.forEach((l) => {
+          if (l.getAttribute('href') === '#' + id) l.setAttribute('aria-current', 'true');
+          else l.removeAttribute('aria-current');
+        });
+      };
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) setCurrent(entry.target.id);
+          }
+        },
+        { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
+      );
+      sections.forEach((s) => io.observe(s));
+    </script>
+  </body>
+</html>
+
+<style>
+  .svg-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+</style>

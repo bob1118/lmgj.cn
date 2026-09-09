@@ -1,0 +1,85 @@
+---
+import { Image } from 'astro:assets';
+import { hero } from '../data/content';
+import heroBg from '../assets/hero-bg.jpg';
+
+// 统计数字拆解：'200+' → 数字 200 + 后缀 '+'（供首屏滚动计数；无数字时维持静态渲染）
+const stats = hero.stats.map((s) => {
+  const m = /^(\d+)(.*)$/.exec(s.value.zh);
+  return { ...s, num: m ? Number(m[1]) : null, suffix: m ? m[2] : s.value.zh };
+});
+---
+
+<section class="hero texture-twill" id="home" aria-label="首屏 Hero">
+  {/* 企业实拍车间大图（织造车间），叠品牌色遮罩保证文字对比度 */}
+  <div class="hero-bg" aria-hidden="true">
+    <Image
+      src={heroBg}
+      alt=""
+      widths={[960, 1280, 1920]}
+      sizes="100vw"
+      quality={65}
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+    />
+  </div>
+
+  <div class="container">
+    <span class="eyebrow">
+      <span class="i18n-zh" lang="zh-CN">{hero.eyebrow.zh}</span>
+      <span class="i18n-en" lang="en">{hero.eyebrow.en}</span>
+    </span>
+
+    <h1>
+      <span class="i18n-zh" lang="zh-CN" set:html={hero.titleHtml.zh} />
+      <span class="i18n-en" lang="en" set:html={hero.titleHtml.en} />
+    </h1>
+
+    <p class="subtitle">
+      <span class="i18n-zh" lang="zh-CN">{hero.subtitle.zh}</span>
+      <span class="i18n-en" lang="en">{hero.subtitle.en}</span>
+    </p>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="#products">
+        <span class="i18n-zh" lang="zh-CN">{hero.ctaProducts.zh}</span>
+        <span class="i18n-en" lang="en">{hero.ctaProducts.en}</span>
+      </a>
+      <a class="btn btn-ghost" href="#contact">
+        <span class="i18n-zh" lang="zh-CN">{hero.ctaContact.zh}</span>
+        <span class="i18n-en" lang="en">{hero.ctaContact.en}</span>
+      </a>
+    </div>
+
+    {/* 以下数字已经企业确认；data-count-to 驱动滚动计数（脚本在 Layout.astro） */}
+    <div class="hero-stats">
+      {
+        stats.map((s) => (
+          <div class="stat">
+            {s.num === null ? (
+              <div class="value">{s.suffix}</div>
+            ) : (
+              <div class="value" data-count-to={s.num} aria-label={s.value.zh}>
+                <span class="num">{s.num}</span>
+                <span class="suffix">{s.suffix}</span>
+              </div>
+            )}
+            <div class="label">
+              <span class="i18n-zh" lang="zh-CN">{s.label.zh}</span>
+              <span class="i18n-en" lang="en">{s.label.en}</span>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+{/* 计数复位：SSR 先输出终值（无 JS 时可见），有 JS 则在首帧前归零，由模块脚本播放滚动计数 */}
+<script is:inline>
+  document.querySelectorAll('[data-count-to]').forEach(function (el) {
+    var n = el.querySelector('.num');
+    if (n) n.textContent = '0';
+  });
+</script>

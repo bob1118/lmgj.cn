@@ -1,0 +1,59 @@
+---
+import { contact, footer, nav, site } from '../data/content';
+import logo from '../assets/logo.png';
+
+const email = contact.channels.find((c) => c.key === 'email');
+const phone = contact.channels.find((c) => c.key === 'phone');
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="name">
+          <img src={logo.src} alt="" width="46" height="46" loading="lazy" />
+          <span>
+            <span class="i18n-zh" lang="zh-CN">{site.nameZh}</span>
+            <span class="i18n-en" lang="en">{site.nameEn}</span>
+          </span>
+        </div>
+        <p>
+          <span class="i18n-zh" lang="zh-CN">{footer.tagline.zh}</span>
+          <span class="i18n-en" lang="en">{footer.tagline.en}</span>
+        </p>
+      </div>
+
+      <nav aria-label="页脚导航 Footer navigation">
+        <h3>
+          <span class="i18n-zh" lang="zh-CN">{footer.navTitle.zh}</span>
+          <span class="i18n-en" lang="en">{footer.navTitle.en}</span>
+        </h3>
+        <ul class="footer-links">
+          {
+            nav.map((item) => (
+              <li>
+                <a href={`#${item.id}`}>
+                  <span class="i18n-zh" lang="zh-CN">{item.label.zh}</span>
+                  <span class="i18n-en" lang="en">{item.label.en}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div>
+        <h3>
+          <span class="i18n-zh" lang="zh-CN">{footer.contactTitle.zh}</span>
+          <span class="i18n-en" lang="en">{footer.contactTitle.en}</span>
+        </h3>
+        <ul class="footer-contact">
+          {email && <li><a href={email.href}>✉ {email.value}</a></li>}
+          {phone && <li><a href={phone.href}>☎ {phone.value}</a></li>}
+        </ul>
+      </div>
+    </div>
+
+    <div class="copyright">{footer.copyright}</div>
+  </div>
+</footer>
