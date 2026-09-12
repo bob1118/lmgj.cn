@@ -60,7 +60,13 @@ const stats = hero.stats.map((s) => {
             {s.num === null ? (
               <div class="value">{s.suffix}</div>
             ) : (
-              <div class="value" data-count-to={s.num} aria-label={s.value.zh}>
+              <div
+                class="value"
+                data-count-to={s.num}
+                aria-label={s.value.zh}
+                data-aria-zh={s.value.zh}
+                data-aria-en={s.value.en}
+              >
                 <span class="num">{s.num}</span>
                 <span class="suffix">{s.suffix}</span>
               </div>
