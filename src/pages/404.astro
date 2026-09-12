@@ -1,0 +1,68 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/content';
+---
+
+<Layout
+  title={`页面未找到 — ${site.nameZh} | Page Not Found — ${site.nameEn}`}
+  description="您访问的页面不存在，欢迎返回首页浏览我们的针织与织造纺织品。Page not found — back to homepage for knitted & woven textiles."
+  noindex
+>
+  <Header />
+  <main class="nf-page">
+    <div class="container">
+      <p class="nf-code" aria-hidden="true">404</p>
+      <h1>
+        <span class="i18n-zh" lang="zh-CN">页面未找到</span>
+        <span class="i18n-en" lang="en">Page Not Found</span>
+      </h1>
+      <p class="nf-hint">
+        <span class="i18n-zh" lang="zh-CN">您访问的页面不存在或已被移动，欢迎返回首页继续浏览。</span>
+        <span class="i18n-en" lang="en">The page you are looking for does not exist or has been moved — head back to the homepage to keep browsing.</span>
+      </p>
+      <a class="btn btn-primary" href="/">
+        <span class="i18n-zh" lang="zh-CN">返回首页</span>
+        <span class="i18n-en" lang="en">Back to Homepage</span>
+      </a>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .nf-page {
+    min-height: 52vh;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    padding: 64px 0;
+  }
+  .nf-page .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  .nf-code {
+    font-size: clamp(4rem, 14vw, 7rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    background: linear-gradient(120deg, var(--brand, #0e6a60), #1d4a6b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin: 0;
+  }
+  .nf-page h1 {
+    margin: 0;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+  }
+  .nf-hint {
+    max-width: 520px;
+    opacity: 0.75;
+    margin: 0;
+  }
+</style>

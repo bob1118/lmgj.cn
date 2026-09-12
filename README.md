@@ -48,7 +48,7 @@ scripts/
 
 ## 部署
 
-静态产物 `dist/` 可部署至任意海外静态托管（Vercel / Cloudflare Pages / Netlify，待定案），无需备案；托管平台绑定域名 lmgj.cn 即可，推送 Git 自动构建。构建时自动生成 `sitemap-index.xml`，`public/robots.txt` 已指向它。
+GitHub Pages 自动部署：推送 `main` 分支后由 `.github/workflows/deploy.yml` 构建（Node 22，先 `astro check` 再 `astro build`）并发布，产物 `dist/`，绑定域名 lmgj.cn。静态产物也可部署至其他海外静态托管（无需备案）。构建时自动生成 `sitemap-index.xml`，`public/robots.txt` 已指向它。
 
 ## 依赖说明
 
