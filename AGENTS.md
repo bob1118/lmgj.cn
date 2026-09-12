@@ -24,7 +24,7 @@
 - 双语切换、移动端菜单、滚动高亮、灯箱（`data-lb-images` 属性）等交互脚本都在 `Layout.astro` 尾部。
 - 双语随语言切换同步的机制（`Layout.astro` 脚本）：图片 alt 用 `data-alt-zh/en`、链接地址用 `data-href-zh/en`（如邮件询盘 mailto 主题，见 `content.ts` 的 `inquirySubject`）、读屏文案用 `data-aria-zh/en`；SSR 默认输出中文值。
 - **语言决策（Q5 已定案）**：默认语言跟随浏览器（`navigator.language` 非 zh 开头 → 英文），用户点过中/EN 按钮则以 localStorage 记录优先；切换逻辑在 `Layout.astro` 首部内联预读脚本，首帧前生效防闪切，勿移到异步脚本。
-- 改 logo 需要重跑 `node scripts/make-brand-assets.mjs` 重新生成 og 图 / favicon；`scripts/convert-heic.mjs` 用于企业 iPhone HEIC 原图转 JPG（素材一次性工具，与站点运行无关，勿顺手删）；`scripts/import-new-products.mjs` 为流行新品实拍导入（原片 `images/` 已清理，重跑会因目录不存在而报错，属预期）。
+- 改 logo 需要重跑 `node scripts/make-brand-assets.mjs` 重新生成 og 图 / favicon；`scripts/convert-heic.mjs` 用于企业 iPhone HEIC 原图转 JPG（素材一次性工具，与站点运行无关，勿顺手删）；`scripts/import-new-products.mjs` 为流行新品 64 张实拍导入（源片在本地 `images/new/`，gitignore 内不入库；**输出为横版**——竖拍原片统一顺时针 rotate 90°，企业要求，重跑可复现）。
 
 ## 内容约定
 

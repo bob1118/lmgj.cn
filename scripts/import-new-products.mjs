@@ -1,6 +1,7 @@
 /**
  * 一次性素材导入：将 images/new/ 下 6 个产品文件夹的实拍 JPG
  * 压缩为 WebP（长边 1920px、质量 ~75）后复制到 src/assets/products/。
+ * 企业要求横版展示：原片为手机竖构图，统一顺时针旋转 90° 后出图（1920×1080）。
  *
  * - 输出 ASCII 文件名：<slug>-01.webp 按原文件名顺序编号
  * - 结束后打印 slug ↔ 文件夹 对应清单供核对
@@ -37,6 +38,7 @@ for (const [folder, slug] of Object.entries(FOLDER_SLUGS)) {
     const outName = `${slug}-${num}.webp`;
     const buf = await sharp(join(SRC_ROOT, folder, files[i]))
       .rotate() // 按 EXIF 方向矫正
+      .rotate(90) // 企业要求横版展示：竖拍原图顺时针转 90°
       .resize({ width: MAX_SIDE, height: MAX_SIDE, fit: 'inside', withoutEnlargement: true })
       .webp({ quality: QUALITY })
       .toBuffer();
