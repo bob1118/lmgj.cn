@@ -173,33 +173,6 @@ html[data-lang='en'] .i18n-zh {
   flex-wrap: wrap;
 }
 
-/* 草稿/待确认徽标 */
-.draft-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
-  border: 1px dashed var(--ochre);
-  border-radius: 999px;
-  color: var(--ochre-deep);
-  background: rgba(192, 138, 62, 0.08);
-  font-size: 0.72rem;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-}
-
-.draft-pill::before {
-  content: '✳';
-  font-size: 0.8em;
-}
-
-/* 正文/联系信息内的行内徽标 */
-p .draft-pill,
-.channel .draft-pill {
-  margin-left: 10px;
-  vertical-align: 2px;
-}
-
 /* ---------- 图片灯箱 ---------- */
 .lightbox {
   position: fixed;
@@ -808,7 +781,7 @@ body.lb-open {
     linear-gradient(120deg, var(--brand-deep), var(--brand-ink));
 }
 
-/* 品类双色：针织=靛蓝 / 织造=品牌青绿；trend 流行新品为 2026 新增三方配色（draft，待企业确认后可调整为品牌色） */
+/* 品类双色：针织=靛蓝 / 织造=品牌青绿；trend 流行新品为 2026 新增三方配色（企业已确认分类，配色如需并入品牌色再调整） */
 .category.knitted .category-banner {
   background:
     radial-gradient(600px 160px at 90% 0%, rgba(255, 255, 255, 0.12), transparent 60%),
@@ -1113,7 +1086,9 @@ body.lb-open {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-a.channel:hover {
+/* 邮箱/电话为链接，地址卡为纯展示 div：hover 动效保持一致 */
+a.channel:hover,
+div.channel:hover {
   transform: translateX(4px);
   box-shadow: var(--shadow);
 }
@@ -1127,6 +1102,14 @@ a.channel:hover {
   display: grid;
   place-items: center;
   flex: none;
+}
+
+.channel .meta {
+  /* 标签在上、值在下：邮箱/电话/地址的值换行显示 */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .channel .meta .label {

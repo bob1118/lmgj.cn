@@ -10,7 +10,7 @@
 /**
  * 产品分类标识：
  * - knitted / woven 为企业确定的两大核心品类；
- * - trend 为「流行新品」分类（2026 新增，draft：分类名称与描述待企业确认）。
+ * - trend 为「流行新品」分类（2026 新增；分类名称「流行新品/Trending」与中英描述已经企业确认）。
  */
 export type ProductCategoryId = 'knitted' | 'woven' | 'trend';
 
@@ -121,9 +121,9 @@ export const about = {
 };
 
 /**
- * draft 专用：为流行新品分类批量生成实拍图列表。
+ * 为流行新品分类批量生成实拍图列表。
  * 图源：src/assets/products/<slug>-NN.webp（scripts/import-new-products.mjs 一次性导入）。
- * 企业确认文案后如需逐图定制 alt，可展开为显式列表。
+ * 企业如需逐图定制 alt，可展开为显式列表。
  */
 function trendImages(slug: string, count: number, zhBase: string, enBase: string): ProductImage[] {
   return Array.from({ length: count }, (_, i) => {
@@ -153,7 +153,7 @@ export const products: {  title: Pair;
   contactCta: { zh: '联系我们获取', en: 'Get in Touch' },
   categories: [
     {
-      // draft：2026 新增的「流行新品」分类（置于首位），分类名称/描述/英文文案为初稿待企业确认；克重企业已提供（醋酸感丝绒 260–300，压花数码印花/压花石纹 240–300，多花型 220–300，仿真丝绒压花/印花 240–280 gsm）。
+      // 「流行新品」分类（置于首位），分类名称与描述已经企业确认；克重企业已提供（醋酸感丝绒 260–300，压花数码印花/压花石纹 240–300，多花型 220–300，仿真丝绒压花/印花 240–280 gsm）。
       // 产品名称来自企业素材文件夹（原片 images/new/ 64 张已压缩为 webp 入库，见 scripts/import-new-products.mjs / import-manifest.json；原片目录已清理）。
       id: 'trend',
       name: { zh: '流行新品', en: 'Trending' },
@@ -427,6 +427,9 @@ export const strength = {
   ],
 };
 
+/** 邮件询盘主题：Contact.astro 按当前语言组装进 mailto;语言切换时由 Layout 脚本同步 href */
+export const inquirySubject: Pair = { zh: '产品咨询', en: 'Product Inquiry' };
+
 export const contact = {
   title: { zh: '联系我们', en: 'Contact Us' },
   intro: {
@@ -439,7 +442,8 @@ export const contact = {
       key: 'email',
       label: { zh: '电子邮箱', en: 'Email' },
       value: 'info@lmgj.cn',
-      href: 'mailto:info@lmgj.cn?subject=Product%20Inquiry%20%E4%BA%A7%E5%93%81%E5%92%A8%E8%AF%A2',
+      // 主题由 inquirySubject 按当前语言组装（Contact.astro），此处保持纯 mailto
+      href: 'mailto:info@lmgj.cn',
     },
     {
       key: 'phone',

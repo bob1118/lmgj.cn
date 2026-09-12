@@ -1,7 +1,13 @@
 ---
-import { contact } from '../data/content';
+import { contact, inquirySubject } from '../data/content';
 
 const email = contact.channels.find((c) => c.key === 'email');
+
+/** mailto 询盘地址：主题按语言组装（默认中文；data-href-* 供语言切换脚本同步） */
+const mailtoHref = (lang: 'zh' | 'en') =>
+  `mailto:${email?.value ?? ''}?subject=${encodeURIComponent(inquirySubject[lang])}`;
+const emailHrefZh = mailtoHref('zh');
+const emailHrefEn = mailtoHref('en');
 
 const icons: Record<string, string> = {
   email:
@@ -33,19 +39,38 @@ const icons: Record<string, string> = {
     <div class="contact-grid">
       <div class="channel-list">
         {
-          contact.channels.map((ch) => (
-            <a class="channel" href={ch.href}>
-              <span class="icon" aria-hidden="true" set:html={icons[ch.key]} />
-              <span class="meta">
-                <span class="label">
-                  <span class="i18n-zh" lang="zh-CN">{ch.label.zh}</span>
-                  <span class="i18n-en" lang="en">{ch.label.en}</span>
+          contact.channels.map((ch) =>
+            ch.key === 'email' ? (
+              <a
+                class="channel"
+                href={emailHrefZh}
+                data-href-zh={emailHrefZh}
+                data-href-en={emailHrefEn}
+              >
+                <span class="icon" aria-hidden="true" set:html={icons[ch.key]} />
+                <span class="meta">
+                  <span class="label">
+                    <span class="i18n-zh" lang="zh-CN">{ch.label.zh}</span>
+                    <span class="i18n-en" lang="en">{ch.label.en}</span>
+                  </span>
+                  <span class="value">{ch.value}</span>
                 </span>
-                <span class="value">{ch.value}</span>
-              </span>
-            </a>
-          ))
+              </a>
+            ) : (
+              <a class="channel" href={ch.href}>
+                <span class="icon" aria-hidden="true" set:html={icons[ch.key]} />
+                <span class="meta">
+                  <span class="label">
+                    <span class="i18n-zh" lang="zh-CN">{ch.label.zh}</span>
+                    <span class="i18n-en" lang="en">{ch.label.en}</span>
+                  </span>
+                  <span class="value">{ch.value}</span>
+                </span>
+              </a>
+            )
+          )
         }
+        {/* 地址为纯展示（非链接），hover 动效与邮箱/电话一致（见 global.css .channel:hover） */}
         <div class="channel">
           <span class="icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
@@ -72,7 +97,7 @@ const icons: Record<string, string> = {
           <span class="i18n-zh" lang="zh-CN">告诉我们您需要的品类、规格与数量，我们将在一个工作日内回复报价与打样方案。</span>
           <span class="i18n-en" lang="en">Tell us the category, specification and quantity you need — we will respond with a quotation and sampling plan within one business day.</span>
         </p>
-        <a class="btn" href={email?.href}>
+        <a class="btn" href={emailHrefZh} data-href-zh={emailHrefZh} data-href-en={emailHrefEn}>
           <span class="i18n-zh" lang="zh-CN">{contact.cta.zh}</span>
           <span class="i18n-en" lang="en">{contact.cta.en}</span>
         </a>

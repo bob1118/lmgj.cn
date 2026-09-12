@@ -16,6 +16,8 @@ interface Props {
   /** 英文语言的 title / description（缺省与中文一致，用于切语言时同步） */
   titleEn?: string;
   descriptionEn?: string;
+  /** 错误状态页（404 等）设为 true：输出 noindex，且 canonical 指回首页 */
+  noindex?: boolean;
 }
 
 const {
@@ -23,10 +25,19 @@ const {
   description,
   titleEn = title,
   descriptionEn = description,
+  noindex = false,
 } = Astro.props;
 
 const email = contact.channels.find((c) => c.key === 'email');
 const phone = contact.channels.find((c) => c.key === 'phone');
+// 企业地址已确认（结构化拆分供 JSON-LD；街道级中文值不再重复入 schema，仅用英文）
+const addressParts = contact.address.value.en.split(',').map((s) => s.trim());
+const postalAddress = {
+  streetAddress: addressParts[0],
+  addressLocality: addressParts.find((s) => /City/i.test(s) && !/Province|County/i.test(s)),
+  addressRegion: addressParts.find((s) => /Province/i.test(s)),
+  addressCountry: 'CN',
+};
 
 const orgJsonLd = {
   '@context': 'https://schema.org',
@@ -35,6 +46,7 @@ const orgJsonLd = {
   alternateName: site.nameZh,
   url: site.url + '/',
   logo: logoAbsolute,
+  address: postalAddress,
   contactPoint: [
     {
       '@type': 'ContactPoint',
@@ -63,6 +75,7 @@ const orgJsonLd = {
     <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src} />
     <link rel="apple-touch-icon" href={appleTouchIcon.src} />
     <link rel="canonical" href={site.url + '/'} />
+    {noindex && <meta name="robots" content="noindex" />}
     <meta name="generator" content={Astro.generator} />
 
     <meta property="og:type" content="website" />
@@ -80,23 +93,29 @@ const orgJsonLd = {
     <meta property="og:locale" content="zh_CN" />
     <meta property="og:locale:alternate" content="en_US" />
 
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageAbsolute} />
+
     <script is:inline type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
 
-    {/* 语言偏好预读取：首帧前生效，避免闪切（并同步标题/描述） */}
+    {/* 语言偏好预读取：首帧前生效，避免闪切（并同步标题/描述）。
+        决策（Q5 已定案）：默认语言跟随浏览器（navigator.language 非 zh 开头 → en）；
+        用户点过切换按钮则以 localStorage 记录为准。 */}
     <script is:inline>
       (function () {
         try {
           var saved = localStorage.getItem('lang');
-          if (saved === 'en' || saved === 'zh') {
-            document.documentElement.dataset.lang = saved;
-            document.documentElement.lang = saved === 'zh' ? 'zh-CN' : 'en';
-            var t = document.querySelector('title');
-            var d = document.querySelector('meta[name="description"]');
-            var tk = saved === 'zh' ? 'titleZh' : 'titleEn';
-            var dk = saved === 'zh' ? 'descZh' : 'descEn';
-            if (t && t.dataset[tk]) document.title = t.dataset[tk];
-            if (d && d.dataset[dk]) d.setAttribute('content', d.dataset[dk]);
-          }
+          var lang = saved === 'en' || saved === 'zh' ? saved : (/^zh/i.test(navigator.language || '') ? 'zh' : 'en');
+          document.documentElement.dataset.lang = lang;
+          document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+          var t = document.querySelector('title');
+          var d = document.querySelector('meta[name="description"]');
+          var tk = lang === 'zh' ? 'titleZh' : 'titleEn';
+          var dk = lang === 'zh' ? 'descZh' : 'descEn';
+          if (t && t.dataset[tk]) document.title = t.dataset[tk];
+          if (d && d.dataset[dk]) d.setAttribute('content', d.dataset[dk]);
         } catch (e) {}
       })();
     </script>
@@ -160,14 +179,30 @@ const orgJsonLd = {
         });
       };
 
+      /** 切语言时同步链接地址（data-href-zh / data-href-en，如双语 mailto 主题） */
+      const applyHrefs = (lang: string) => {
+        document.querySelectorAll<HTMLAnchorElement>('a[data-href-zh]').forEach((a) => {
+          const href = (lang === 'zh' ? a.dataset.hrefZh : a.dataset.hrefEn) ?? '';
+          if (href) a.setAttribute('href', href);
+        });
+      };
+
+      /** 切语言时同步 aria-label（data-aria-zh / data-aria-en，如 Hero 统计数字读屏文案） */
+      const applyAriaLabels = (lang: string) => {
+        document.querySelectorAll<HTMLElement>('[data-aria-zh]').forEach((el) => {
+          const label = (lang === 'zh' ? el.dataset.ariaZh : el.dataset.ariaEn) ?? '';
+          if (label) el.setAttribute('aria-label', label);
+        });
+      };
+
       applyPageMeta(currentLang());
       applyImageAlts(currentLang());
+      applyHrefs(currentLang());
+      applyAriaLabels(currentLang());
 
       // ---------- 图片灯箱 ----------
       interface LbItem {
         src: string;
-        /** 双语拼接（回退用） */
-        alt: string;
         /** 单语言（按当前语言显示；由 data-lb-images 携带） */
         altZh?: string;
         altEn?: string;
@@ -189,8 +224,8 @@ const orgJsonLd = {
         if (!lbEl || !lbImg || !lbCount) return;
         const item = lbState.items[lbState.index];
         if (!item) return;
-        // 说明文字按当前语言显示，缺字段时回退双语串
-        const text = (isZh() ? item.altZh : item.altEn) || item.alt;
+        // 说明文字按当前语言显示
+        const text = (isZh() ? item.altZh : item.altEn) || item.altZh || item.altEn || '';
         lbImg.src = item.src;
         lbImg.alt = text;
         if (lbCaption) lbCaption.textContent = text;
@@ -308,6 +343,17 @@ const orgJsonLd = {
         lbOpen(items, Number(trigger.dataset.lbIndex ?? '0') || 0, trigger);
       });
 
+      // 悬停预热：提前加载首张灯箱大图，点击时浏览器已命中缓存（间距/网络零改动）
+      document.addEventListener('pointerenter', (e) => {
+        const trigger = e.target instanceof Element ? e.target.closest<HTMLElement>('a[data-lb-images]') : null;
+        if (!trigger || trigger.dataset.lbPre === '1') return;
+        trigger.dataset.lbPre = '1';
+        try {
+          const first = JSON.parse(trigger.dataset.lbImages ?? '[]')[0];
+          if (first?.src) new Image().src = first.src;
+        } catch {}
+      }, true); // 捕获阶段：pointerenter 不冒泡，但 closest 委托需能收到子元素进入
+
       // ---------- 移动端菜单开合（含 Esc / 外部点击关闭） ----------
       const navToggle = document.getElementById('nav-toggle');
       const siteNav = document.getElementById('site-nav');
@@ -346,6 +392,8 @@ const orgJsonLd = {
           root.lang = next === 'zh' ? 'zh-CN' : 'en';
           applyPageMeta(next);
           applyImageAlts(next);
+          applyHrefs(next);
+          applyAriaLabels(next);
           // 灯箱开着时同步其文案
           if (lbEl && !lbEl.hidden) lbRender();
           try {
