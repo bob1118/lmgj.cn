@@ -11,10 +11,12 @@
   --brand-ink: #062f2b;
   --brand-soft: #e3efec;
 
-  /* 品类功能色 */
+  /* 品类功能色（trend=流行新品粉调，2026 定稿） */
   --indigo: #1d4a6b;
   --cat-knitted: var(--indigo);
   --cat-woven: var(--brand);
+  --cat-trend: #c2537a;
+  --cat-trend-deep: #8d3d5e;
 
   /* 基底与文字 */
   --linen: #f4efe5;
@@ -781,7 +783,7 @@ body.lb-open {
     linear-gradient(120deg, var(--brand-deep), var(--brand-ink));
 }
 
-/* 品类双色：针织=靛蓝 / 织造=品牌青绿；trend 流行新品为 2026 新增三方配色（企业已确认分类，配色如需并入品牌色再调整） */
+/* 品类双色：针织=靛蓝 / 织造=品牌青绿 / trend 流行新品=粉调（--cat-* 三方变量统一取色，banner/spec-chip 共用） */
 .category.knitted .category-banner {
   background:
     radial-gradient(600px 160px at 90% 0%, rgba(255, 255, 255, 0.12), transparent 60%),
@@ -798,7 +800,7 @@ body.lb-open {
 .category.trend .category-banner {
   background:
     radial-gradient(600px 160px at 90% 0%, rgba(255, 255, 255, 0.12), transparent 60%),
-    linear-gradient(120deg, #c2537a, #8d3d5e);
+    linear-gradient(120deg, var(--cat-trend), var(--cat-trend-deep));
 }
 
 .category-banner .cat-name {

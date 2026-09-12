@@ -33,7 +33,7 @@ public/
 └── robots.txt             # 爬虫规则（sitemap 由 @astrojs/sitemap 构建时生成）
 scripts/
 ├── make-brand-assets.mjs  # 生成 og 分享图 / favicon / touch icon（sharp）
-├── import-new-products.mjs # 流行新品 64 张实拍导入（原片 images/ 已清理，重跑会报错属预期）
+├── import-new-products.mjs # 流行新品 64 张实拍导入（源片在本地 images/new/，gitignore 不入库；统一顺时针 rotate 90° 输出横版，重跑可复现）
 ├── import-manifest.json   # 上项导入的源片 ↔ 产物对应台账
 └── convert-heic.mjs       # HEIC 素材转 JPG（企业 iPhone 原图用）
 ```
@@ -41,7 +41,7 @@ scripts/
 ## 内容维护
 
 - **改文案**：只改 `src/data/content.ts`，所有字段中英成对（`Pair`），改中文时同步改英文。
-- **换/加图片**：把 JPG/PNG 放进 `src/assets/products/` 或 `src/assets/company/`（ASCII 文件名），在 `content.ts` 对应位置登记同名字路径（如 `/images/products/jersey-1.jpg`，`lib/images.ts` 按文件名匹配，路径仅作 key 用途）。批量实拍导入可用 `scripts/import-new-products.mjs` 模式（原片目录 images/ 已清理，勿再引用）。
+- **换/加图片**：把 JPG/PNG 放进 `src/assets/products/` 或 `src/assets/company/`（ASCII 文件名），在 `content.ts` 对应位置登记同名字路径（如 `/images/products/jersey-1.jpg`，`lib/images.ts` 按文件名匹配，路径仅作 key 用途）。批量实拍导入用 `scripts/import-new-products.mjs`（源片本地 `images/new/`，gitignore 内不入库）。
 - **切语言行为**：默认中文；`html[data-lang]` 控制成对 span 显隐，切换时同步 `document.title`、meta description 与图片 alt。
 - **产品图灯箱**：卡片带 `data-lb-images` 属性，点击进灯箱（键盘 ←/→ 切换、Esc 关闭），逻辑在 `Layout.astro` 尾部脚本。
 - **品牌资产重生成**：替换 logo 或产品主图后重跑 `node scripts/make-brand-assets.mjs`。

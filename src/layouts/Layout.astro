@@ -326,6 +326,33 @@ const orgJsonLd = {
         lbEl.addEventListener('click', (e) => {
           if (e.target === lbEl) lbCloseFn();
         });
+        // 触屏滑动切图：水平位移 > 48px 判定左/右滑，单张图不切换
+        const stage = lbEl.querySelector('.lb-stage');
+        if (stage) {
+          let touchX: number | null = null;
+          stage.addEventListener(
+            'touchstart',
+            (ev) => {
+              if (lbState.items.length < 2) return;
+              const touch = (ev as TouchEvent).changedTouches[0];
+              if (!touch) return;
+              touchX = touch.clientX;
+            },
+            { passive: true }
+          );
+          stage.addEventListener(
+            'touchend',
+            (ev) => {
+              if (touchX === null) return;
+              const touch = (ev as TouchEvent).changedTouches[0];
+              if (!touch) return;
+              const dx = touch.clientX - touchX;
+              touchX = null;
+              if (Math.abs(dx) > 48) lbGo(dx < 0 ? 1 : -1); // 左滑=下一张
+            },
+            { passive: true }
+          );
+        }
       };
 
       // 事件委托：所有带 data-lb-images 的卡片统一进灯箱
