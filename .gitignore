@@ -1,4 +1,5 @@
-# 构建产物与依赖
+# 构建产物与依赖；原片目录 images/ 不入库（原片已清理，webp 资产在 src/assets/）
+images/
 node_modules/
 dist/
 .astro/
