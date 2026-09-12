@@ -7,6 +7,13 @@
  *   页面上以小徽标（draft-pill）提示的位置与此处对应。
  */
 
+/**
+ * 产品分类标识：
+ * - knitted / woven 为企业确定的两大核心品类；
+ * - trend 为「流行新品」分类（2026 新增，draft：分类名称与描述待企业确认）。
+ */
+export type ProductCategoryId = 'knitted' | 'woven' | 'trend';
+
 export interface Pair {
   zh: string;
   en: string;
@@ -26,7 +33,7 @@ export interface ProductItem {
 }
 
 export interface ProductCategory {
-  id: 'knitted' | 'woven';
+  id: ProductCategoryId;
   name: Pair;
   desc: Pair;
   items: ProductItem[];
@@ -113,8 +120,22 @@ export const about = {
   ],
 };
 
-export const products: {
-  title: Pair;
+/**
+ * draft 专用：为流行新品分类批量生成实拍图列表。
+ * 图源：src/assets/products/<slug>-NN.webp（scripts/import-new-products.mjs 一次性导入）。
+ * 企业确认文案后如需逐图定制 alt，可展开为显式列表。
+ */
+function trendImages(slug: string, count: number, zhBase: string, enBase: string): ProductImage[] {
+  return Array.from({ length: count }, (_, i) => {
+    const n = i + 1;
+    return {
+      src: `/images/products/${slug}-${String(n).padStart(2, '0')}.webp`,
+      alt: { zh: `${zhBase}实拍图${n}`, en: `${enBase} view ${n}` },
+    };
+  });
+}
+
+export const products: {  title: Pair;
   intro: Pair;
   contactLead: Pair;
   contactCta: Pair;
@@ -132,6 +153,78 @@ export const products: {
   contactCta: { zh: '联系我们获取', en: 'Get in Touch' },
   categories: [
     {
+      // draft：2026 新增的「流行新品」分类（置于首位），分类名称/描述/英文文案为初稿待企业确认；克重企业已提供（醋酸感丝绒 260–300，压花数码印花/压花石纹 240–300，多花型 220–300，仿真丝绒压花/印花 240–280 gsm）。
+      // 产品名称来自企业素材文件夹（原片 images/new/ 64 张已压缩为 webp 入库，见 scripts/import-new-products.mjs / import-manifest.json；原片目录已清理）。
+      id: 'trend',
+      name: { zh: '流行新品', en: 'Trending' },
+      desc: {
+        zh: '聚焦今年流行款式与色彩方向，紧跟国际时尚趋势提供应季新品面料。',
+        en: 'Curated around this year\u2019s trending styles and color directions — in-season new fabrics following international fashion trends.',
+      },
+      items: [
+        {
+          name: { zh: '醋酸感丝绒', en: 'Acetate-Feel Velvet' },
+          spec: '260–300 gsm',
+          desc: {
+            zh: '垂坠丝滑、光泽柔和，连衣裙与外套的应季新品面料。',
+            en: 'Fluid drape with a soft sheen — a seasonal new fabric for dresses and coats.',
+          },
+          // 实拍图：企业已提供（企业实拍，8 张，经 scripts/import-new-products.mjs 压缩入库）
+          images: trendImages('acetate-velvet', 8, '醋酸感丝绒', 'Acetate-feel velvet'),
+        },
+        {
+          name: { zh: '醋酸感丝绒 · 压花数码印花', en: 'Acetate-Feel Velvet Emboss, Digital Print' },
+          spec: '240–300 gsm',
+          desc: {
+            zh: '数码印花花型与压花绒面结合，图案立体、层次分明。',
+            en: 'Digital-print motifs on embossed velvet — dimensional patterns with clear depth.',
+          },
+          // 实拍图：企业已提供（企业实拍，压花数码印花 8 张，经 scripts/import-new-products.mjs 压缩入库）
+          images: trendImages('acetate-velvet-digital-print', 8, '醋酸感丝绒压花数码印花', 'Acetate-feel velvet emboss digital print'),
+        },
+        {
+          name: { zh: '醋酸感丝绒 · 压花石纹', en: 'Acetate-Feel Velvet Stone Emboss' },
+          spec: '240–300 gsm',
+          desc: {
+            zh: '石纹肌理压花，手感立体、光泽内敛，呈现自然质感。',
+            en: 'Stone-texture embossed velvet — dimensional hand-feel with a subtle, natural sheen.',
+          },
+          // 实拍图：企业已提供（企业实拍，压花石纹 8 张，经 scripts/import-new-products.mjs 压缩入库）
+          images: trendImages('acetate-velvet-stone', 8, '醋酸感丝绒压花石纹', 'Acetate-feel velvet stone emboss'),
+        },
+        {
+          name: { zh: '醋酸感丝绒 · 多花型', en: 'Acetate-Feel Velvet, Multi-Design' },
+          spec: '220–300 gsm',
+          desc: {
+            zh: '一个绒底承载多组花型，可按服饰款式灵活选配。',
+            en: 'One velvet base carrying multiple designs — flexible matching by apparel style.',
+          },
+          // 实拍图：企业已提供（企业实拍，多花型 8 张，经 scripts/import-new-products.mjs 压缩入库）
+          images: trendImages('acetate-velvet-multi-design', 8, '醋酸感丝绒多花型', 'Acetate-feel velvet multi-design'),
+        },
+        {
+          name: { zh: '仿真丝绒 · 压花', en: 'Silk-Feel Velvet Emboss' },
+          spec: '240–280 gsm',
+          desc: {
+            zh: '仿真丝光泽的绒面压花，价格亲民、质感高级。',
+            en: 'Silk-look velvet with embossed texture — accessible pricing with a premium feel.',
+          },
+          // 实拍图：企业已提供（企业实拍，16 张，经 scripts/import-new-products.mjs 压缩入库）
+          images: trendImages('copy-silk-velvet-emboss', 16, '仿真丝绒压花', 'Silk-feel velvet emboss'),
+        },
+        {
+          name: { zh: '仿真丝绒 · 印花', en: 'Silk-Feel Velvet Print' },
+          spec: '240–280 gsm',
+          desc: {
+            zh: '绒面印花花型清透、光泽柔和，适合连衣裙与家居用途。',
+            en: 'Clear printed motifs on a soft-sheen pile — for dresses and home applications.',
+          },
+          // 实拍图：企业已提供（企业实拍，16 张，经 scripts/import-new-products.mjs 压缩入库）
+          images: trendImages('copy-silk-velvet-print', 16, '仿真丝绒印花', 'Silk-feel velvet print'),
+        },
+      ],
+    },
+    {
       id: 'knitted',
       name: { zh: '针织纺织品', en: 'Knitted Textiles' },
       desc: {
@@ -146,7 +239,7 @@ export const products: {
             zh: '透气亲肤，T 恤与居家服经典面料。',
             en: 'Breathable & skin-friendly, a classic for T-shirts and loungewear.',
           },
-          // 实拍图：企业已提供（源文件 images/knitted/Jersey1.jpg、Jersey2.jpg）
+          // 实拍图：企业已提供（企业实拍，压缩入库）
           images: [
             {
               src: '/images/products/jersey-1.jpg',
@@ -165,7 +258,7 @@ export const products: {
             zh: '弹性足、回弹好，用于领口袖口与修身款。',
             en: 'High stretch & recovery, for collars, cuffs and fitted styles.',
           },
-          // 实拍图：企业已提供（源文件 images/knitted/Rib1.jpg、Rib2.jpg）
+          // 实拍图：企业已提供（企业实拍，压缩入库）
           images: [
             {
               src: '/images/products/rib-1.jpg',
@@ -184,7 +277,7 @@ export const products: {
             zh: '柔软吸汗，卫衣帽衫常用面料。',
             en: 'Soft and absorbent, the go-to fabric for hoodies and sweatshirts.',
           },
-          // 实拍图：企业已提供（源文件 images/knitted/Terry1.jpg、Terry2.jpg）
+          // 实拍图：企业已提供（企业实拍，压缩入库）
           images: [
             {
               src: '/images/products/terry-1.jpg',
@@ -213,7 +306,7 @@ export const products: {
             zh: '细洁平滑、手感爽挺，经典衬衫面料。',
             en: 'Fine, smooth and crisp — a classic shirting fabric.',
           },
-          // 实拍图：企业已提供（源文件 images/woven/Poplin1.jpg、Poplin2.jpg）
+          // 实拍图：企业已提供（企业实拍，压缩入库）
           images: [
             {
               src: '/images/products/poplin-1.jpg',
@@ -232,7 +325,7 @@ export const products: {
             zh: '结实耐磨，工装裤装首选面料。',
             en: 'Strong and abrasion-resistant, first choice for workwear and trousers.',
           },
-          // 实拍图：企业已提供（源文件 images/woven/twill1.jpg、twill2.jpg）
+          // 实拍图：企业已提供（企业实拍，压缩入库）
           images: [
             {
               src: '/images/products/twill-1.jpg',
@@ -251,7 +344,7 @@ export const products: {
             zh: '挺括耐用，箱包、休闲服饰与家纺适用。',
             en: 'Sturdy and durable, for bags, casual wear and home textiles.',
           },
-          // 实拍图：企业已提供（源文件 images/woven/Oxford1.jpg、Oxford2.jpg）
+          // 实拍图：企业已提供（企业实拍，压缩入库）
           images: [
             {
               src: '/images/products/oxford-1.jpg',
@@ -274,7 +367,7 @@ export const strength = {
     zh: '可靠的品质来自可靠的体系——资质认证、生产设备、品控流程与全球市场的实景展示。',
     en: 'Consistent quality comes from a consistent system — a real view of our qualifications, equipment, QC process and global market.',
   },
-  // 资质与认证：企业已提供（源文件归档于 images/company/，构建副本改用 ASCII 文件名）
+  // 资质与认证：企业已提供（企业实拍，压缩入库并改用 ASCII 文件名）
   certificates: [
     {
       src: '/images/company/business-license.jpg',
@@ -287,7 +380,7 @@ export const strength = {
       alt: { zh: '商业授权书', en: 'Commercial authorization letter' },
     },
   ],
-  // 生产设备：企业已提供实景照片（源文件 images/company/f1.jpg、f2.jpg）
+  // 生产设备：企业已提供实景照片（企业实拍，压缩入库）
   equipment: [
     {
       src: '/images/company/equipment-1.jpg',
@@ -300,7 +393,7 @@ export const strength = {
       alt: { zh: '生产设备实景二', en: 'Production equipment view 2' },
     },
   ],
-  // 品控流程：企业已提供实景照片（源文件 images/company/qc1.jpg、qc2.jpg）
+  // 品控流程：企业已提供实景照片（企业实拍，压缩入库）
   qualityControl: [
     {
       src: '/images/company/qc-1.jpg',
@@ -313,7 +406,7 @@ export const strength = {
       alt: { zh: '品控流程实景二', en: 'Quality control process view 2' },
     },
   ],
-  // 全球市场：企业已提供实景照片（源文件 images/company/c1.jpg、c2.jpg）
+  // 全球市场：企业已提供实景照片（企业实拍，压缩入库）
   market: [
     {
       src: '/images/company/market-1.jpg',

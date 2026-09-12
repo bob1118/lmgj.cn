@@ -37,16 +37,30 @@ import { assetImage, toLightboxImages } from '../lib/images';
                 <span class="i18n-en" lang="en">{cat.desc.en}</span>
               </p>
             </div>
-            {cat.id === 'knitted' ? (
+            {/* 三分类纹样：针织=线圈 织造=方格 流行新品=斜纹 */}
+            {cat.id === 'knitted' && (
               <svg class="knit-pattern" viewBox="0 0 96 56" aria-hidden="true">
                 <rect width="96" height="56" fill="url(#patt-knit)" />
               </svg>
-            ) : (
+            )}
+            {cat.id === 'woven' && (
               <svg class="woven-pattern" viewBox="0 0 96 56" aria-hidden="true">
                 <rect width="96" height="56" fill="url(#patt-woven-light)" />
               </svg>
             )}
+            {cat.id === 'trend' && (
+              <svg class="trend-pattern" viewBox="0 0 96 56" aria-hidden="true">
+                <rect width="96" height="56" fill="url(#patt-twill)" />
+              </svg>
+            )}
           </div>
+
+          {cat.items.length === 0 && (
+            <p class="cat-empty">
+              <span class="i18n-zh" lang="zh-CN">款式与颜色方案整理中，欢迎垂询获取最新样品。</span>
+              <span class="i18n-en" lang="en">New styles and colorways being curated — ask us for the latest samples.</span>
+            </p>
+          )}
 
           <div class="product-grid">
             {cat.items.map((item, i) => {
@@ -84,10 +98,15 @@ import { assetImage, toLightboxImages } from '../lib/images';
                             <rect width="300" height="150" fill={['#1d4a6b', '#255a7d', '#163a55'][i]} />
                             <rect width="300" height="150" fill="url(#patt-knit)" />
                           </>
-                        ) : (
+                        ) : cat.id === 'woven' ? (
                           <>
                             <rect width="300" height="150" fill={['#e7ddc8', '#dfcfae', '#d5c9ac'][i]} />
                             <rect width="300" height="150" fill="url(#patt-woven)" />
+                          </>
+                        ) : (
+                          <>
+                            <rect width="300" height="150" fill={['#f0d5d3', '#e6b7b2', '#d99c9a'][i]} />
+                            <rect width="300" height="150" fill="url(#patt-twill)" />
                           </>
                         )}
                       </svg>

@@ -808,7 +808,7 @@ body.lb-open {
     linear-gradient(120deg, var(--brand-deep), var(--brand-ink));
 }
 
-/* 品类双色：针织=靛蓝 / 织造=品牌青绿 */
+/* 品类双色：针织=靛蓝 / 织造=品牌青绿；trend 流行新品为 2026 新增三方配色（draft，待企业确认后可调整为品牌色） */
 .category.knitted .category-banner {
   background:
     radial-gradient(600px 160px at 90% 0%, rgba(255, 255, 255, 0.12), transparent 60%),
@@ -819,6 +819,13 @@ body.lb-open {
   background:
     radial-gradient(600px 160px at 90% 0%, rgba(255, 255, 255, 0.12), transparent 60%),
     linear-gradient(120deg, var(--brand-deep), var(--brand-ink));
+}
+
+/* 流行新品：暖调粉/珊瑚，与两大品类区分 */
+.category.trend .category-banner {
+  background:
+    radial-gradient(600px 160px at 90% 0%, rgba(255, 255, 255, 0.12), transparent 60%),
+    linear-gradient(120deg, #c2537a, #8d3d5e);
 }
 
 .category-banner .cat-name {
@@ -844,6 +851,20 @@ body.lb-open {
   width: 96px;
   height: 56px;
   flex: none;
+}
+
+/* 流行新品：斜纹纹样（与两大品类区分） */
+.trend-pattern {
+  width: 96px;
+  height: 56px;
+  flex: none;
+}
+
+/* 空分类（如流行新品产品未上架前）：占位提示，视觉弱化 */
+.cat-empty {
+  padding: 22px 32px;
+  color: var(--muted);
+  font-size: 0.92rem;
 }
 
 .product-grid {

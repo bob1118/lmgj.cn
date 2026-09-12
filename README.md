@@ -17,29 +17,31 @@ npm run preview    # 本地预览构建产物
 ```
 src/
 ├── data/content.ts        # 全站双语文案（唯一内容源，中英成对维护）
-├── assets/                # 图片资产（经 astro:assets 构建优化为 webp）
+├── assets/                # 图片资产（经 astro:assets 构建优化为 webp；原片不入库）
 │   ├── logo.png           # 企业 logo（favicon 备份源）
-│   ├── hero-bg.jpg        # 首屏背景（织造车间实拍，源文件 images/company/1.jpg）
+│   ├── hero-bg.jpg        # 首屏背景（织造车间实拍，压缩副本）
 │   ├── og-image.jpg       # 1200×630 社交分享图（scripts/make-brand-assets.mjs 生成）
 │   ├── favicon-32.png / apple-touch-icon.png   # 图标（同上生成）
-│   ├── products/          # 产品实拍图（jersey-1.jpg 等）
+│   ├── products/          # 产品实拍图（jersey-1.jpg 等 + 流行新品丝绒 64 张 webp）
 │   └── company/           # 车间/证书/设备/品控/市场图（workshop.jpg、business-license.jpg 等）
 ├── lib/images.ts          # 图片解析 helper（文件名 → 构建资产；灯箱列表）
 ├── layouts/Layout.astro   # 页头 Meta/SEO、共享织物纹样、灯箱与交互脚本
 ├── components/            # Header / Hero / About / Products / Strength / Contact / Footer
-├── styles/global.css      # 设计系统（品牌青绿 + 亚麻底 + 织纹肌理；品类双色：针织靛蓝/织造青绿）
+├── styles/global.css      # 设计系统（品牌青绿 + 亚麻底 + 织纹肌理；品类双色：针织靛蓝/织造青绿/流行新品粉调）
 └── pages/index.astro      # 单页组装
 public/
 └── robots.txt             # 爬虫规则（sitemap 由 @astrojs/sitemap 构建时生成）
 scripts/
 ├── make-brand-assets.mjs  # 生成 og 分享图 / favicon / touch icon（sharp）
+├── import-new-products.mjs # 流行新品 64 张实拍导入（原片 images/ 已清理，重跑会报错属预期）
+├── import-manifest.json   # 上项导入的源片 ↔ 产物对应台账
 └── convert-heic.mjs       # HEIC 素材转 JPG（企业 iPhone 原图用）
 ```
 
 ## 内容维护
 
 - **改文案**：只改 `src/data/content.ts`，所有字段中英成对（`Pair`），改中文时同步改英文。
-- **换/加图片**：把 JPG/PNG 放进 `src/assets/products/` 或 `src/assets/company/`（ASCII 文件名），在 `content.ts` 对应位置登记同名字路径（如 `/images/products/jersey-1.jpg`，`lib/images.ts` 按文件名匹配，路径仅作 key 用途）。
+- **换/加图片**：把 JPG/PNG 放进 `src/assets/products/` 或 `src/assets/company/`（ASCII 文件名），在 `content.ts` 对应位置登记同名字路径（如 `/images/products/jersey-1.jpg`，`lib/images.ts` 按文件名匹配，路径仅作 key 用途）。批量实拍导入可用 `scripts/import-new-products.mjs` 模式（原片目录 images/ 已清理，勿再引用）。
 - **切语言行为**：默认中文；`html[data-lang]` 控制成对 span 显隐，切换时同步 `document.title`、meta description 与图片 alt。
 - **产品图灯箱**：卡片带 `data-lb-images` 属性，点击进灯箱（键盘 ←/→ 切换、Esc 关闭），逻辑在 `Layout.astro` 尾部脚本。
 - **品牌资产重生成**：替换 logo 或产品主图后重跑 `node scripts/make-brand-assets.mjs`。
