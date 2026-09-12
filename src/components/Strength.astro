@@ -42,9 +42,15 @@ const mediaCards: { index: number; items: MediaItem[]; fit: 'contain' | 'cover' 
 
     <div class="strength-grid">
       {
-        mediaCards.map((media) => {
-          const card = strength.cards[media.index];
-          const lb = toLightboxImages(media.items);
+        (
+          await Promise.all(
+            mediaCards.map(async (media) => {
+              const card = strength.cards[media.index];
+              const lb = await toLightboxImages(media.items);
+              return { media, card, lb };
+            })
+          )
+        ).map(({ media, card, lb }) => {
           return (
             <div class="strength-card media-card">
               <div class="card-side">

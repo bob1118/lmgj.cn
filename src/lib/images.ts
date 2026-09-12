@@ -3,6 +3,7 @@
  * 组件经此 helper 将其映射到 src/assets 下经 astro:assets 优化的产物。
  */
 import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
 import type { ProductImage } from '../data/content';
 
 const modules = import.meta.glob<{ default: ImageMetadata }>(
@@ -25,21 +26,28 @@ export function assetImage(src: string): ImageMetadata {
   return img;
 }
 
+/** 解析资产在指定宽度的优化产物地址（webp，构建时生成） */
+async function getImageSrc(meta: ImageMetadata, width: number): Promise<string> {
+  const resolved = await getImage({ src: meta, width, format: 'webp' });
+  return resolved.src;
+}
+
 export interface LightboxImage {
   src: string;
-  /** 双语拼接（灯箱内展示用） */
-  alt: string;
-  /** 单语言（供页面 img alt 随语言切换） */
   altZh: string;
   altEn: string;
 }
 
-/** 将内容源的图片列表转为灯箱所需的优化图列表（src 为构建产物地址） */
-export function toLightboxImages(images: ProductImage[] | undefined): LightboxImage[] {
-  return (images ?? []).map((img) => ({
-    src: assetImage(img.src).src,
-    alt: `${img.alt.zh} ${img.alt.en}`,
-    altZh: img.alt.zh,
-    altEn: img.alt.en,
-  }));
+/** 灯箱所需列表：src 为指定宽度的优化大图地址（构建期生成）；组件 frontmatter 中 await 使用 */
+export async function toLightboxImages(
+  images: ProductImage[] | undefined,
+  width = 1280
+): Promise<LightboxImage[]> {
+  return Promise.all(
+    (images ?? []).map(async (img) => ({
+      src: await getImageSrc(assetImage(img.src), width),
+      altZh: img.alt.zh,
+      altEn: img.alt.en,
+    }))
+  );
 }

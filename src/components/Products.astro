@@ -24,7 +24,16 @@ import { assetImage, toLightboxImages } from '../lib/images';
     </div>
 
     {
-      products.categories.map((cat) => (
+      (
+        await Promise.all(
+          products.categories.map(async (cat) => {
+            const lbByItem = await Promise.all(
+              cat.items.map((item) => toLightboxImages(item.images))
+            );
+            return { cat, lbByItem };
+          })
+        )
+      ).map(({ cat, lbByItem }) => (
         <div class:list={['category', cat.id]}>
           <div class="category-banner">
             <div>
@@ -65,7 +74,7 @@ import { assetImage, toLightboxImages } from '../lib/images';
           <div class="product-grid">
             {cat.items.map((item, i) => {
               const main = item.images?.[0];
-              const lb = toLightboxImages(item.images);
+              const lb = lbByItem[i];
               const count = lb.length;
               return (
                 <article class="product-card">
@@ -74,7 +83,7 @@ import { assetImage, toLightboxImages } from '../lib/images';
                       <a
                         class="thumb-main"
                         href={lb[0]?.src ?? main.src}
-                        title={lb[0]?.alt}
+                        title={[lb[0]?.altZh, lb[0]?.altEn].filter(Boolean).join(' / ')}
                         data-lb-images={JSON.stringify(lb)}
                         data-lb-index="0"
                       >
@@ -135,7 +144,7 @@ import { assetImage, toLightboxImages } from '../lib/images';
           </div>
         </div>
       ))
-    }
+      }
 
     <div class="products-cta">
       <span class="lead">
