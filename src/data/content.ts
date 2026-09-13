@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 全站双语文案（唯一内容源）。
  *
  * 约定：
@@ -73,7 +73,7 @@ export const nav: { id: string; label: Pair }[] = [
 
 export const hero = {
   // draft：定位由「针织织造」扩为「面料 + 配饰」，待企业确认
-  eyebrow: { zh: '面料 · 服饰配饰进出口', en: 'Fabrics & Accessories Import & Export' },
+  eyebrow: { zh: '面料 · 配饰进出口', en: 'Fabrics & Accessories Import & Export' },
   // 标题允许少量 <em> 强调标记（由组件 set:html 渲染）
   titleHtml: {
     zh: '莱盟纺织，织造<em>可信赖</em>的全球供应',
@@ -81,10 +81,10 @@ export const hero = {
   },
   // draft：描述同步补充配饰板块，待企业确认
   subtitle: {
-    zh: '专注面料与服饰配饰进出口贸易，为国内外采购商提供从选料、打样到大货交付的一站式服务。',
+    zh: '专注面料与配饰进出口贸易，为国内外采购商提供从选料、打样到大货交付的一站式服务。',
     en: 'Specialized in fabrics and accessories trading — one-stop service from sourcing and sampling to bulk delivery for buyers worldwide.',
   },
-  ctaProducts: { zh: '查看产品', en: 'Our Products' },
+  ctaProducts: { zh: '查看产品', en: 'View Products' },
   ctaContact: { zh: '联系我们', en: 'Contact Us' },
   // 以下数字已经企业确认
   stats: [
@@ -98,18 +98,18 @@ export const about = {
   title: { zh: '关于我们', en: 'About Us' },
   // draft：原文（专注针织与织造纺织品进出口）已经企业确认，扩充配饰后待企业确认
   lead: {
-    zh: '金华莱盟纺织品有限公司是一家专注于面料与服饰配饰进出口的外贸企业，依托中国主要纺织产业带的成熟供应链，为全球采购商提供稳定、优质、高效的供应服务。',
+    zh: '金华莱盟纺织品有限公司是一家专注于面料与配饰进出口的外贸企业，依托中国主要纺织产业带的成熟供应链，为全球采购商提供稳定、优质、高效的供应服务。',
     en: 'Jinhua Laimeng Textile Factory is an import & export company specializing in fabrics and accessories. Backed by mature supply chains across China\u2019s major textile hubs, we deliver stable, quality-assured products to buyers worldwide.',
   },
   // draft：原文为企业确认文案，扩写配饰后待企业确认
   body: {
-    zh: '我们长期深耕针织、梭织面料与服饰配饰板块，熟悉国际市场的品质标准与合规要求，能够快速响应打样、翻单与大货交付需求，成为客户长期信赖的供应链伙伴。',
+    zh: '我们长期深耕针织、梭织面料与配饰板块，熟悉国际市场的品质标准与合规要求，能够快速响应打样、翻单与大货交付需求，成为客户长期信赖的供应链伙伴。',
     en: 'Focusing on knitted, woven fabrics and accessories, we understand international quality standards and compliance requirements, responding quickly to sampling, re-orders and bulk production — a supply chain partner you can rely on for the long term.',
   },
   advantagesTitle: { zh: '核心优势', en: 'Why Choose Us' },
   advantages: [
     {
-      title: { zh: '源头供应链', en: 'Source Supply Chain' },
+      title: { zh: '源头供应链', en: 'Mill-Direct Supply' },
       desc: {
         zh: '直连产业带工厂，货源稳定、价格有竞争力。',
         en: 'Direct access to mill clusters — stable supply at competitive prices.',
@@ -155,23 +155,32 @@ function productPhotos(slug: string, count: number, zhBase: string, enBase: stri
   });
 }
 export const products: {
+  /** 区块 kicker（页面上方的小标签，双语成对） */
+  kicker: Pair;
+  /** 空分类占位提示（产品未上架时显示） */
+  emptyHint: Pair;
   title: Pair;
   intro: Pair;
   contactLead: Pair;
   contactCta: Pair;
   categories: ProductCategory[];
 } = {
+  kicker: { zh: '产品分类', en: 'Categories' },
+  emptyHint: {
+    zh: '款式与颜色方案整理中，欢迎垂询获取最新样品。',
+    en: 'New styles and colorways being curated — ask us for the latest samples.',
+  },
   title: { zh: '产品中心', en: 'Products' },
   // draft：定位由「两大品类」改为「面料 + 配饰」两分类，待企业确认
   intro: {
-    zh: '聚焦面料与服饰配饰两大板块，涵盖针织、梭织与流行新品面料及配饰产品；以下为代表产品，更多品类欢迎垂询。',
+    zh: '聚焦面料与配饰两大板块，涵盖针织、梭织与流行新品面料及配饰产品；以下为代表产品，更多品类欢迎垂询。',
     en: 'Focused on fabrics and accessories — knitted, woven and trending fabrics alongside trims and beadwork. Representative products below; more available on request.',
   },
   contactLead: {
     zh: '需要完整产品目录或寄送样品？',
     en: 'Need the full catalog or samples?',
   },
-  contactCta: { zh: '联系我们获取', en: 'Get in Touch' },
+  contactCta: { zh: '欢迎垂询', en: 'Get in Touch' },
   categories: [
     {
       // 面料：子分组结构对应素材目录 images/fabrics/{knitted,woven,Trend}，各产品的子文件夹见台账
@@ -180,11 +189,11 @@ export const products: {
       name: { zh: '面料', en: 'Fabrics' },
       desc: {
         zh: '涵盖针织、梭织与流行新品三大类面料，常年供应主流规格，支持打样与大货定制。',
-        en: 'Knitted, woven and trending fabrics in mainstream specifications — sampling and bulk production on request.',
+        en: 'Knitted, woven and Trending collections — mainstream specifications in regular supply, sampling and bulk production on request.',
       },
       groups: [
         {
-          // 「流行新品」名称与描述已经企业确认，降级为面料子分组沿用；克重企业已提供（醋酸感丝绒 260–300，压花数码印花/压花石纹 240–300，多花型 220–300，仿真丝绒压花/印花 240–280 gsm）。
+          // 「流行新品」名称与描述已经企业确认，降级为面料子分组沿用；克重企业已提供（醋酸感丝绒 260–300，压花数码印花/压花石纹 240–300，多花型 220–300，仿真丝绒压花/印花 240–280，企业口径 gsm，站点统一展示为 g/m²）。
           // 产品名称来自企业素材文件夹（原片 images/fabrics/Trend/ 6 组 64 张重新压缩入库）。
           id: 'trend',
           name: { zh: '流行新品', en: 'Trending' },
@@ -195,7 +204,7 @@ export const products: {
           items: [
             {
               name: { zh: '醋酸感丝绒', en: 'Acetate-Feel Velvet' },
-              spec: '260–300 gsm',
+              spec: '260–300 g/m²',
               desc: {
                 zh: '垂坠丝滑、光泽柔和，连衣裙与外套的应季新品面料。',
                 en: 'Fluid drape with a soft sheen — a seasonal new fabric for dresses and coats.',
@@ -205,7 +214,7 @@ export const products: {
             },
             {
               name: { zh: '醋酸感丝绒 · 压花数码印花', en: 'Acetate-Feel Velvet Emboss, Digital Print' },
-              spec: '240–300 gsm',
+              spec: '240–300 g/m²',
               desc: {
                 zh: '数码印花花型与压花绒面结合，图案立体、层次分明。',
                 en: 'Digital-print motifs on embossed velvet — dimensional patterns with clear depth.',
@@ -215,7 +224,7 @@ export const products: {
             },
             {
               name: { zh: '醋酸感丝绒 · 压花石纹', en: 'Acetate-Feel Velvet Stone Emboss' },
-              spec: '240–300 gsm',
+              spec: '240–300 g/m²',
               desc: {
                 zh: '石纹肌理压花，手感立体、光泽内敛，呈现自然质感。',
                 en: 'Stone-texture embossed velvet — dimensional hand-feel with a subtle, natural sheen.',
@@ -225,7 +234,7 @@ export const products: {
             },
             {
               name: { zh: '醋酸感丝绒 · 多花型', en: 'Acetate-Feel Velvet, Multi-Design' },
-              spec: '220–300 gsm',
+              spec: '220–300 g/m²',
               desc: {
                 zh: '一个绒底承载多组花型，可按服饰款式灵活选配。',
                 en: 'One velvet base carrying multiple designs — flexible matching by apparel style.',
@@ -235,7 +244,7 @@ export const products: {
             },
             {
               name: { zh: '仿真丝绒 · 压花', en: 'Silk-Feel Velvet Emboss' },
-              spec: '240–280 gsm',
+              spec: '240–280 g/m²',
               desc: {
                 zh: '仿真丝光泽的绒面压花，价格亲民、质感高级。',
                 en: 'Silk-look velvet with embossed texture — accessible pricing with a premium feel.',
@@ -245,7 +254,7 @@ export const products: {
             },
             {
               name: { zh: '仿真丝绒 · 印花', en: 'Silk-Feel Velvet Print' },
-              spec: '240–280 gsm',
+              spec: '240–280 g/m²',
               desc: {
                 zh: '绒面印花花型清透、光泽柔和，适合连衣裙与家居用途。',
                 en: 'Clear printed motifs on a soft-sheen pile — for dresses and home applications.',
@@ -560,8 +569,8 @@ export const contact = {
 export const footer = {
   // draft：定位同步补充配饰板块，待企业确认
   tagline: {
-    zh: '面料与服饰配饰进出口 · 面向全球的可靠供应',
-    en: 'Fabrics & accessories import and export — reliable supply for the world.',
+    zh: '面料与配饰进出口 · 面向全球的可靠供应',
+    en: 'Fabrics & accessories import and export — reliable supply, worldwide.',
   },
   navTitle: { zh: '快速导航', en: 'Quick Links' },
   contactTitle: { zh: '联系方式', en: 'Contact' },

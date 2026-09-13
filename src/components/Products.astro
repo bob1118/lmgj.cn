@@ -81,8 +81,8 @@ const jsonLd = {
   <div class="container">
     <div class="section-head">
       <span class="kicker">
-        <span class="i18n-zh" lang="zh-CN">产品分类</span>
-        <span class="i18n-en" lang="en">Categories</span>
+        <span class="i18n-zh" lang="zh-CN">{products.kicker.zh}</span>
+        <span class="i18n-en" lang="en">{products.kicker.en}</span>
       </span>
       <h2>
         <span class="i18n-zh" lang="zh-CN">{products.title.zh}</span>
@@ -151,8 +151,8 @@ const jsonLd = {
       {/* 无产品的分类提示（如新品未上架） */}
       {!groups && !flat?.length && (
         <p class="cat-empty">
-          <span class="i18n-zh" lang="zh-CN">款式与颜色方案整理中，欢迎垂询获取最新样品。</span>
-          <span class="i18n-en" lang="en">New styles and colorways being curated — ask us for the latest samples.</span>
+          <span class="i18n-zh" lang="zh-CN">{products.emptyHint.zh}</span>
+          <span class="i18n-en" lang="en">{products.emptyHint.en}</span>
         </p>
       )}
 
