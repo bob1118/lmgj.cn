@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import { hero } from '../data/content';
 import heroBg from '../assets/hero-bg.jpg';
 
@@ -8,7 +8,22 @@ const stats = hero.stats.map((s) => {
   const m = /^(\d+)(.*)$/.exec(s.value.zh);
   return { ...s, num: m ? Number(m[1]) : null, suffix: m ? m[2] : s.value.zh };
 });
+
+/* 头图预加载：与下方 <Image> 相同的 srcset/sizes，LCP 提前一拍 */
+const widths = [960, 1280, 1920];
+const heroSrcs = await Promise.all(widths.map((w) => getImage({ src: heroBg, width: w, format: 'webp', quality: 65 })));
+const imagesrcset = heroSrcs.map((s, i) => `${s.src} ${widths[i]}w`).join(', ');
+const defaultSrc = heroSrcs[1].src;
 ---
+
+<link
+  rel="preload"
+  as="image"
+  href={defaultSrc}
+  imagesrcset={imagesrcset}
+  imagesizes="100vw"
+  fetchpriority="high"
+/>
 
 <section class="hero texture-twill" id="home" aria-label="首屏 Hero">
   {/* 企业实拍车间大图（织造车间），叠品牌色遮罩保证文字对比度 */}

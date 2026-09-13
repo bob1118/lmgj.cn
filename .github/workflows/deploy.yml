@@ -26,6 +26,8 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run build
+      # 发布前烟囱检查：断言卡片/页签/JSON-LD 存在、无原片泄漏与 draft 残留
+      - run: npm run smoke
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

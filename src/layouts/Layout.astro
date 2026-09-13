@@ -124,7 +124,9 @@ const orgJsonLd = {
   <body>
     <slot />
 
-    {/* 全站共享的织物纹样（SVG pattern），供各组件以 url(#id) 引用 */}
+    {/* 全站共享的织物纹样（SVG pattern），供各组件以 url(#id) 引用。
+        注意：以下 pattern 的填充/描边均为半透明白，仅适合引用在深色底（banner/深色遮罩）——
+        用于浅底时（如 ProductCard 占位 SVG）不会显色，勿挪用 */}
     <svg class="svg-defs" aria-hidden="true" focusable="false">
       <defs>
         {/* 针织线圈纹 */}
@@ -489,8 +491,12 @@ const orgJsonLd = {
           applyImageAlts(next);
           applyHrefs(next);
           applyAriaLabels(next);
-          // 灯箱开着时同步其文案
-          if (lbEl && !lbEl.hidden) lbRender();
+          // 灯箱开着时同步其文案；caption 带 aria-live，静默换词防读屏连读两版
+          if (lbEl && !lbEl.hidden && lbCaption) {
+            lbCaption.removeAttribute('aria-live');
+            lbRender();
+            lbCaption.setAttribute('aria-live', 'polite');
+          }
           try {
             localStorage.setItem('lang', next);
           } catch {}
