@@ -45,6 +45,7 @@ scripts/
 - **改文案**：只改 `src/data/content.ts`，所有字段中英成对（`Pair`），改中文时同步改英文。
 - **换/加图片**：把 JPG/PNG 放进 `src/assets/products/` 或 `src/assets/company/`（ASCII 文件名），在 `content.ts` 对应位置登记同名字路径（如 `/images/products/jersey-01.webp`，`lib/images.ts` 按文件名匹配，路径仅作 key 用途）。批量实拍导入用 `scripts/import-two-categories.mjs`（源片本地 `images/fabrics/` 与 `images/accessories/`，gitignore 内不入库，重跑幂等）。
 - **产品结构**：两分类同位页签——产品区顶部「面料 / 配饰」页签点击切换（英文定稿 Fabrics / Accessories；默认面料，非当前区块隐藏）；面料 `fabrics` 子分组显示顺序：trend 流行新品 → knitted 针织 → woven 梭织（woven 中文定稿为「梭织」），配饰 `accessories` 平铺 5 款（Trending Accessories 置于首位）；面料子分组文案沿用企业确认稿，配饰 5 款与全局定位文案为 draft 待企业确认。
+- **响应式与页签**：断点 1020/860/640——861–1020px 产品两列、≤860px 单列；分类页签桌面吸顶（≤640px 回落），配饰页签激活态用暖金深色。
 - **切语言行为**：默认语言跟随浏览器（非 zh 开头 → 英文），用户点过中/EN 按钮则以 localStorage 记录优先；`html[data-lang]` 控制成对 span 显隐，切换时同步 `document.title`、meta description 与图片 alt。
 - **产品图灯箱**：卡片带 `data-lb-images` 属性，点击进灯箱（键盘 ←/→ 切换、Esc 关闭），逻辑在 `Layout.astro` 尾部脚本。
 - **品牌资产重生成**：替换 logo 或产品主图后重跑 `node scripts/make-brand-assets.mjs`。

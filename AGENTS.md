@@ -20,10 +20,11 @@
 - 双语文案唯一源：`src/data/content.ts`（440 行左右，含产品/实力/联系全部数据）。
 - 图片走 `astro:assets`：新图放进 `src/assets/products/` 或 `src/assets/company/`（ASCII 文件名），在 `content.ts` 登记路径；解析逻辑在 `src/lib/images.ts`（路径仅作 key，按文件名匹配）。**不要往 `public/` 放内容图**（仅 robots.txt）。
 - 灯箱图列表用 `src/lib/images.ts` 的 `toLightboxImages`（**异步**，组件 frontmatter 中 `await`）：src 为构建期 `getImage()` 生成的 1280 宽优化 webp 大图，别退回直接用原图 metadata 的 `.src`。
-- 三大品类配色收编在 `src/styles/global.css` 变量（面料子分类 `--cat-knitted` / `--cat-woven` / `--cat-trend(-deep)`，配饰 `--cat-accessories(-deep)`），改品类色改变量，勿在组件硬编码。
+- 三大品类配色收编在 `src/styles/global.css` 变量（面料子分类 `--cat-knitted` / `--cat-woven` / `--cat-trend(-deep)`，配饰 `--cat-accessories(-deep)`），改品类色改变量，勿在组件硬编码。spec-chip（克重角标）按品类着色：针织靛蓝 / 梭织（默认）青绿 / trend 子分组粉调。
 - 织物纹样为共享 SVG pattern（定义在 `Layout.astro`，组件内以 `url(#patt-knit)` / `patt-woven` / `patt-twill` / `patt-beads` 引用），勿重复定义。
 - 产品卡是独立组件 `src/components/ProductCard.astro`（灯箱、count/spec/trend 徽标、占位图），`Products.astro` 只做面料子分组与配饰平铺的层级编排。
-- **产品两分类同位页签**：`.cat-tabs` 页签（面料/配饰）点击切换 `.category` 显示（非首个默认 `.is-hidden`），切换脚本在 `Layout.astro` 尾部；`data-cat-tab` 与面板 `id="cat-<id>"` 必须成对，换分类结构时勿拆成两块上下堆叠。
+- **产品两分类同位页签**：`.cat-tabs` 页签（面料/配饰）点击切换 `.category` 显示（非首个默认 `.is-hidden`），切换脚本在 `Layout.astro` 尾部；`data-cat-tab` 与面板 `id="cat-<id>"` 必须成对，换分类结构时勿拆成两块上下堆叠。页签桌面 `position: sticky` 吸顶（≤640px 回落），激活态面料用 brand-ink、配饰用 `--cat-accessories-deep`（选中看 `aria-selected`，勿只依赖 `.is-active`）。
+- **响应式断点**：1020 / 860 / 640 三档——861–1020px 产品与优势均两列，≤860px 产品单列；调布局时注意中间档勿再漏。
 - 双语切换、移动端菜单、滚动高亮、灯箱（`data-lb-images` 属性）等交互脚本都在 `Layout.astro` 尾部。
 - 双语随语言切换同步的机制（`Layout.astro` 脚本）：图片 alt 用 `data-alt-zh/en`、链接地址用 `data-href-zh/en`（如邮件询盘 mailto 主题，见 `content.ts` 的 `inquirySubject`）、读屏文案用 `data-aria-zh/en`；SSR 默认输出中文值。
 - **语言决策（Q5 已定案）**：默认语言跟随浏览器（`navigator.language` 非 zh 开头 → 英文），用户点过中/EN 按钮则以 localStorage 记录优先；切换逻辑在 `Layout.astro` 首部内联预读脚本，首帧前生效防闪切，勿移到异步脚本。
