@@ -805,12 +805,19 @@ body.lb-open {
   box-shadow: var(--shadow);
 }
 
-/* 分类页签：同一位置在面料/配饰间切换（脚本见 Layout.astro 尾部） */
+/* 分类页签：同一位置在面料/配饰间切换（脚本见 Layout.astro 尾部）；
+   桌面吸顶方便中途切换，移动端不吸（占空间且纵向空间紧） */
 .cat-tabs {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 4px;
+  position: sticky;
+  top: var(--header-h);
+  z-index: 6;
+  padding: 10px 0;
+  background: var(--linen);
+  box-shadow: 0 1px 0 var(--line);
 }
 
 .cat-tab {
@@ -835,6 +842,12 @@ body.lb-open {
   background: var(--brand-ink);
   border-color: var(--brand-ink);
   color: #fff;
+}
+
+/* 配饰页签激活态联动品类暖金深色，一眼分辨当前板块 */
+.cat-tab[aria-selected='true'][data-cat-tab='accessories'] {
+  background: var(--cat-accessories-deep);
+  border-color: var(--cat-accessories-deep);
 }
 
 /* 非当前分类区块隐藏（页签切换） */
@@ -1039,6 +1052,11 @@ body.lb-open {
 /* 规格角标按品类着色 */
 .category.knitted .spec-chip {
   color: var(--cat-knitted);
+}
+
+/* trend 降为面料子分组后，其 spec-chip 沿用子分类粉调（默认为梭织青绿） */
+.category-group.trend .spec-chip {
+  color: var(--cat-trend);
 }
 
 .product-card .card-body {
@@ -1389,6 +1407,11 @@ div.channel:hover {
   .advantages {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  /* 平板区间产品两列：861–1020px 若直接落单列，横版图会被拉成超宽细条 */
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 860px) {
@@ -1426,6 +1449,13 @@ div.channel:hover {
 @media (max-width: 640px) {
   .container {
     width: min(1120px, 100% - 36px);
+  }
+
+  /* 页签在窄屏不吸顶（sticky 回落，保留间距观感） */
+  .cat-tabs {
+    position: static;
+    box-shadow: none;
+    padding-bottom: 6px;
   }
 
   .advantages {
