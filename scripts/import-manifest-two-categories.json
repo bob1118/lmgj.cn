@@ -533,29 +533,36 @@
   },
   {
     "sourceRoot": "accessories//bugle beads",
-    "sourceFile": "43ebbacc1103475104a8eed3becd9cc7.jpg",
+    "sourceFile": "13918ff78df8edea4f6105b45953a2ac.jpg",
     "outName": "bugle-beads-01.webp",
+    "bytes": 151242,
+    "reused": false
+  },
+  {
+    "sourceRoot": "accessories//bugle beads",
+    "sourceFile": "43ebbacc1103475104a8eed3becd9cc7.jpg",
+    "outName": "bugle-beads-02.webp",
     "bytes": 207426,
     "reused": false
   },
   {
     "sourceRoot": "accessories//bugle beads",
     "sourceFile": "5c9cc0f3e24c9aa1dc1c43852f232160.jpg",
-    "outName": "bugle-beads-02.webp",
+    "outName": "bugle-beads-03.webp",
     "bytes": 134706,
     "reused": false
   },
   {
     "sourceRoot": "accessories//bugle beads",
     "sourceFile": "8318f98f34ff73e17a32bb51ef47db28.jpg",
-    "outName": "bugle-beads-03.webp",
+    "outName": "bugle-beads-04.webp",
     "bytes": 280664,
     "reused": false
   },
   {
     "sourceRoot": "accessories//bugle beads",
     "sourceFile": "ef77ee4906b910e5d26e2db45c1c6a62.jpg",
-    "outName": "bugle-beads-04.webp",
+    "outName": "bugle-beads-05.webp",
     "bytes": 122758,
     "reused": false
   },
@@ -568,15 +575,8 @@
   },
   {
     "sourceRoot": "accessories//craft pearl beads",
-    "sourceFile": "13918ff78df8edea4f6105b45953a2ac.jpg",
-    "outName": "craft-pearl-beads-02.webp",
-    "bytes": 151242,
-    "reused": false
-  },
-  {
-    "sourceRoot": "accessories//craft pearl beads",
     "sourceFile": "9bf8c29811cde7ae5032b0a28b8b7663.jpg",
-    "outName": "craft-pearl-beads-03.webp",
+    "outName": "craft-pearl-beads-02.webp",
     "bytes": 109848,
     "reused": false
   },

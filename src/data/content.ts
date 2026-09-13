@@ -429,8 +429,8 @@ export const products: {
             zh: '细长管形珠饰，点缀礼服、针织与箱包配饰。',
             en: 'Slender tube-shaped beads for gowns, knitwear and bag accents.',
           },
-          // 实拍图：企业已提供（企业实拍 4 张，原片为 hash 文件名，台账可溯源）
-          images: productPhotos('bugle-beads', 4, '串珠管珠', 'Bugle beads'),
+          // 实拍图：企业已提供（企业实拍 5 张，2026-09 企业将原工艺珍珠款式图挪入本款，台账可溯源）
+          images: productPhotos('bugle-beads', 5, '串珠管珠', 'Bugle beads'),
         },
         {
           name: { zh: '工艺珍珠', en: 'Craft Pearl Beads' },
@@ -438,8 +438,8 @@ export const products: {
             zh: '珠面圆润、光泽柔和，适合女装与礼服的细节点缀。',
             en: 'Round pearls with a soft sheen — refined accents for women\u2019s wear and gowns.',
           },
-          // 实拍图：企业已提供（企业实拍 3 张）
-          images: productPhotos('craft-pearl-beads', 3, '工艺珍珠', 'Craft pearl beads'),
+          // 实拍图：企业已提供（企业实拍 2 张；2026-09 企业将其中一张挪至串珠管珠款）
+          images: productPhotos('craft-pearl-beads', 2, '工艺珍珠', 'Craft pearl beads'),
         },
         {
           name: { zh: '水钻珠', en: 'Rhinestone Beads' },
