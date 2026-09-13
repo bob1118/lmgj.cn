@@ -215,6 +215,29 @@ body.lb-open {
   border-radius: 10px;
   background: var(--white);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  /* 换图 loading 态：半透明占位，load 后恢复（避免白闪无反馈） */
+  transition: opacity 0.15s ease;
+}
+
+.lightbox .lb-img.is-loading {
+  opacity: 0.35;
+}
+
+/* 双击 1:1 纹理放大：遮罩层可滚动查看原始尺寸细节 */
+.lightbox.is-zoom {
+  align-items: flex-start;
+  overflow: auto;
+}
+
+.lightbox.is-zoom .lb-img {
+  max-width: none;
+  max-height: none;
+  width: 100%;
+  cursor: zoom-out;
+}
+
+.lightbox .lb-img {
+  cursor: zoom-in;
 }
 
 .lb-caption {
