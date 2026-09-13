@@ -11,12 +11,14 @@
   --brand-ink: #062f2b;
   --brand-soft: #e3efec;
 
-  /* 品类功能色（trend=流行新品粉调，2026 定稿） */
+  /* 品类功能色（分类改为「面料 + 配饰」后：knitted/woven/trend 为面料子分类色沿用；accessories=配饰暖金调） */
   --indigo: #1d4a6b;
   --cat-knitted: var(--indigo);
   --cat-woven: var(--brand);
   --cat-trend: #c2537a;
   --cat-trend-deep: #8d3d5e;
+  --cat-accessories: #b78b2c;
+  --cat-accessories-deep: #8a6420;
 
   /* 基底与文字 */
   --linen: #f4efe5;
@@ -609,6 +611,15 @@ body.lb-open {
   color: #fff;
 }
 
+/* 企业要求：整句标题（如 Woven with Trust, Delivered Worldwide）桌面上不折行；
+   小屏（≤860px）空间不足时回退自动换行，避免溢出 */
+@media (min-width: 861px) {
+  .hero h1 {
+    white-space: nowrap;
+    max-width: none;
+  }
+}
+
 .hero h1 em {
   font-style: normal;
   color: var(--ochre);
@@ -771,6 +782,43 @@ body.lb-open {
   box-shadow: var(--shadow);
 }
 
+/* 分类页签：同一位置在面料/配饰间切换（脚本见 Layout.astro 尾部） */
+.cat-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.cat-tab {
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--brand-ink);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 10px 24px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.cat-tab:hover {
+  border-color: var(--brand);
+}
+
+.cat-tab.is-active,
+.cat-tab[aria-selected='true'] {
+  background: var(--brand-ink);
+  border-color: var(--brand-ink);
+  color: #fff;
+}
+
+/* 非当前分类区块隐藏（页签切换） */
+.category.is-hidden {
+  display: none;
+}
+
 .category-banner {
   display: flex;
   align-items: center;
@@ -783,24 +831,20 @@ body.lb-open {
     linear-gradient(120deg, var(--brand-deep), var(--brand-ink));
 }
 
-/* 品类双色：针织=靛蓝 / 织造=品牌青绿 / trend 流行新品=粉调（--cat-* 三方变量统一取色，banner/spec-chip 共用） */
-.category.knitted .category-banner {
+/* 分类 banner：面料默认品牌青绿，配饰下方另设 */
+
+/* 配饰：暖金调，与面料（青绿系）区分 */
+.category.accessories .category-banner {
   background:
     radial-gradient(600px 160px at 90% 0%, rgba(255, 255, 255, 0.12), transparent 60%),
-    linear-gradient(120deg, var(--cat-knitted), var(--brand-ink));
+    linear-gradient(120deg, var(--cat-accessories), var(--cat-accessories-deep));
 }
 
-.category.woven .category-banner {
+/* 面料：主体品牌青绿，banner 即默认品牌色 */
+.category.fabrics .category-banner {
   background:
     radial-gradient(600px 160px at 90% 0%, rgba(255, 255, 255, 0.12), transparent 60%),
     linear-gradient(120deg, var(--brand-deep), var(--brand-ink));
-}
-
-/* 流行新品：暖调粉/珊瑚，与两大品类区分 */
-.category.trend .category-banner {
-  background:
-    radial-gradient(600px 160px at 90% 0%, rgba(255, 255, 255, 0.12), transparent 60%),
-    linear-gradient(120deg, var(--cat-trend), var(--cat-trend-deep));
 }
 
 .category-banner .cat-name {
@@ -814,13 +858,6 @@ body.lb-open {
   max-width: 560px;
 }
 
-/* 针织：线圈纹样（SVG pattern 填充） */
-.knit-pattern {
-  width: 96px;
-  height: 56px;
-  flex: none;
-}
-
 /* 织造：平纹方格纹样 */
 .woven-pattern {
   width: 96px;
@@ -828,8 +865,8 @@ body.lb-open {
   flex: none;
 }
 
-/* 流行新品：斜纹纹样（与两大品类区分） */
-.trend-pattern {
+/* 配饰：串珠圆点纹样 */
+.beads-pattern {
   width: 96px;
   height: 56px;
   flex: none;
@@ -840,6 +877,45 @@ body.lb-open {
   padding: 22px 32px;
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+/* 面料子分组标题：色点按子品类取色（--cat-* 变量） */
+.group-head {
+  padding: 24px 32px 0;
+}
+
+.group-head h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.08rem;
+  color: var(--brand-ink);
+}
+
+.group-head h3::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  flex: none;
+}
+
+.category-group.knitted .group-head h3::before {
+  background: var(--cat-knitted);
+}
+
+.category-group.woven .group-head h3::before {
+  background: var(--cat-woven);
+}
+
+.category-group.trend .group-head h3::before {
+  background: var(--cat-trend);
+}
+
+.group-head p {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.88rem;
 }
 
 .product-grid {
@@ -921,6 +997,20 @@ body.lb-open {
   padding: 4px 10px;
   border-radius: 999px;
   border: 1px solid var(--line);
+}
+
+/* 流行新品角标（badge，如配饰 trend 项）：左上粉调 */
+.product-card .thumb .trend-chip {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: var(--cat-trend);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
 }
 
 /* 规格角标按品类着色 */

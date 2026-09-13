@@ -1,10 +1,83 @@
 ---
-import { Image } from 'astro:assets';
-import { products } from '../data/content';
-import { assetImage, toLightboxImages } from '../lib/images';
+import type { ProductCategory, ProductGroup, ProductItem } from '../data/content';
+import { products, site } from '../data/content';
+import { toLightboxImages } from '../lib/images';
+import ProductCard from './ProductCard.astro';
+
+interface LbEntry {
+  item: ProductItem;
+  lb: Awaited<ReturnType<typeof toLightboxImages>>;
+}
+
+interface GroupData {
+  group: ProductGroup;
+  cards: LbEntry[];
+}
+
+/** 物料结构：groups = 面料子分组，flat = 配饰平铺 */
+interface CategoryData {
+  cat: ProductCategory;
+  groups: GroupData[] | null;
+  flat: LbEntry[] | null;
+}
+
+/** 物料构建：面料按子分组、配饰平铺；逐卡预生成构建期灯箱列表 */
+const renderCards = async (items: ProductItem[], width = 1280): Promise<LbEntry[]> =>
+  Promise.all(items.map(async (item) => ({ item, lb: await toLightboxImages(item.images, width) })));
+
+const catData: CategoryData[] = await Promise.all(
+  products.categories.map(async (cat): Promise<CategoryData> => {
+    if (cat.groups) {
+      return {
+        cat,
+        groups: await Promise.all(
+          cat.groups.map(async (g): Promise<GroupData> => ({ group: g, cards: await renderCards(g.items) }))
+        ),
+        flat: null,
+      };
+    }
+    // 配饰珠饰类细节密度低，灯箱 1024w 足够（降重约 1/3）；面料保持 1280
+    return { cat, groups: null, flat: await renderCards(cat.items ?? [], 1024) };
+  })
+);
+
+/** JSON-LD 结构化数据：与页签/产品卡数据同源生成（顺序即页面展示顺序，勿在列表手工排序） */
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      name: site.nameZh,
+      alternateName: site.nameEn,
+      url: site.url + '/',
+      inLanguage: ['zh-CN', 'en'],
+    },
+    {
+      '@type': 'ItemList',
+      name: products.title.zh,
+      alternateName: products.title.en,
+      itemListElement: catData.flatMap(({ cat, groups, flat }) => {
+        const source: (LbEntry | GroupData)[] = groups ?? (flat ?? []);
+        let position = 0;
+        return source.flatMap((node) => {
+          const cards = 'cards' in node ? node.cards : [node as LbEntry];
+          return cards.map((card) => ({
+            '@type': 'ListItem',
+            position: ++position,
+            name: card.item.name.zh,
+            alternateName: card.item.name.en,
+            url: `${site.url}/#cat-${cat.id}`,
+            image: card.lb[0]?.src && (card.lb[0].src.startsWith('http') ? card.lb[0].src : site.url + card.lb[0].src),
+          }));
+        });
+      }),
+    },
+  ],
+};
 ---
 
 <section class="products" id="products">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <div class="container">
     <div class="section-head">
       <span class="kicker">
@@ -23,128 +96,98 @@ import { assetImage, toLightboxImages } from '../lib/images';
       </div>
     </div>
 
-    {
-      (
-        await Promise.all(
-          products.categories.map(async (cat) => {
-            const lbByItem = await Promise.all(
-              cat.items.map((item) => toLightboxImages(item.images))
-            );
-            return { cat, lbByItem };
-          })
-        )
-      ).map(({ cat, lbByItem }) => (
-        <div class:list={['category', cat.id]}>
-          <div class="category-banner">
-            <div>
-              <div class="cat-name">
-                <span class="i18n-zh" lang="zh-CN">{cat.name.zh}</span>
-                <span class="i18n-en" lang="en">{cat.name.en}</span>
-              </div>
-              <p class="cat-desc">
-                <span class="i18n-zh" lang="zh-CN">{cat.desc.zh}</span>
-                <span class="i18n-en" lang="en">{cat.desc.en}</span>
-              </p>
-            </div>
-            {/* 三分类纹样：针织=线圈 织造=方格 流行新品=斜纹 */}
-            {cat.id === 'knitted' && (
-              <svg class="knit-pattern" viewBox="0 0 96 56" aria-hidden="true">
-                <rect width="96" height="56" fill="url(#patt-knit)" />
-              </svg>
-            )}
-            {cat.id === 'woven' && (
-              <svg class="woven-pattern" viewBox="0 0 96 56" aria-hidden="true">
-                <rect width="96" height="56" fill="url(#patt-woven-light)" />
-              </svg>
-            )}
-            {cat.id === 'trend' && (
-              <svg class="trend-pattern" viewBox="0 0 96 56" aria-hidden="true">
-                <rect width="96" height="56" fill="url(#patt-twill)" />
-              </svg>
-            )}
+    {/* 同一位置的分类页签：面料 / 配饰（点击切换下方区块，默认面料） */}
+    <div class="cat-tabs" role="tablist" aria-label="分类切换">
+      {catData.map(({ cat }, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`tab-${cat.id}`}
+          class:list={['cat-tab', i === 0 && 'is-active']}
+          data-cat-tab={cat.id}
+          tabindex={i === 0 ? 0 : -1}
+          aria-selected={i === 0}
+          aria-controls={`cat-${cat.id}`}
+        >
+          <span class="i18n-zh" lang="zh-CN">{cat.name.zh}</span>
+          <span class="i18n-en" lang="en">{cat.name.en}</span>
+        </button>
+      ))}
+    </div>
+
+{
+  /* 双分类：面料（含子分组）与配饰（平铺）；同一位置页签切换，非首个默认隐藏 */
+  catData.map(({ cat, groups, flat }, i) => (
+    <div
+      class:list={['category', cat.id, i > 0 && 'is-hidden']}
+      id={`cat-${cat.id}`}
+      role="tabpanel"
+      aria-labelledby={`tab-${cat.id}`}
+    >
+      <div class="category-banner">
+        <div>
+          <div class="cat-name">
+            <span class="i18n-zh" lang="zh-CN">{cat.name.zh}</span>
+            <span class="i18n-en" lang="en">{cat.name.en}</span>
           </div>
+          <p class="cat-desc">
+            <span class="i18n-zh" lang="zh-CN">{cat.desc.zh}</span>
+            <span class="i18n-en" lang="en">{cat.desc.en}</span>
+          </p>
+        </div>
+        {/* 顶分类纹样：面料=方格 配饰=串珠圆点 */}
+        {cat.id === 'fabrics' && (
+          <svg class="woven-pattern" viewBox="0 0 96 56" aria-hidden="true">
+            <rect width="96" height="56" fill="url(#patt-woven-light)" />
+          </svg>
+        )}
+        {cat.id === 'accessories' && (
+          <svg class="beads-pattern" viewBox="0 0 96 56" aria-hidden="true">
+            <rect width="96" height="56" fill="url(#patt-beads)" />
+          </svg>
+        )}
+      </div>
 
-          {cat.items.length === 0 && (
-            <p class="cat-empty">
-              <span class="i18n-zh" lang="zh-CN">款式与颜色方案整理中，欢迎垂询获取最新样品。</span>
-              <span class="i18n-en" lang="en">New styles and colorways being curated — ask us for the latest samples.</span>
+      {/* 无产品的分类提示（如新品未上架） */}
+      {!groups && !flat?.length && (
+        <p class="cat-empty">
+          <span class="i18n-zh" lang="zh-CN">款式与颜色方案整理中，欢迎垂询获取最新样品。</span>
+          <span class="i18n-en" lang="en">New styles and colorways being curated — ask us for the latest samples.</span>
+        </p>
+      )}
+
+      {/* 面料：子分组（标题沿用企业确认文案 + 产品网格） */}
+      {groups?.map(({ group, cards }) => (
+        <div class:list={['category-group', group.id]}>
+          <div class="group-head">
+            <h3>
+              <span class="i18n-zh" lang="zh-CN">{group.name.zh}</span>
+              <span class="i18n-en" lang="en">{group.name.en}</span>
+            </h3>
+            <p>
+              <span class="i18n-zh" lang="zh-CN">{group.desc.zh}</span>
+              <span class="i18n-en" lang="en">{group.desc.en}</span>
             </p>
-          )}
-
+          </div>
           <div class="product-grid">
-            {cat.items.map((item, i) => {
-              const main = item.images?.[0];
-              const lb = lbByItem[i];
-              const count = lb.length;
-              return (
-                <article class="product-card">
-                  <div class="thumb">
-                    {main ? (
-                      <a
-                        class="thumb-main"
-                        href={lb[0]?.src ?? main.src}
-                        title={[lb[0]?.altZh, lb[0]?.altEn].filter(Boolean).join(' / ')}
-                        data-lb-images={JSON.stringify(lb)}
-                        data-lb-index="0"
-                      >
-                        <Image
-                          src={assetImage(main.src)}
-                          alt={lb[0]?.altZh ?? ''}
-                          data-alt-zh={lb[0]?.altZh}
-                          data-alt-en={lb[0]?.altEn}
-                          width={640}
-                          height={320}
-                          widths={[480, 640, 960]}
-                          sizes="(max-width: 860px) 100vw, 340px"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </a>
-                    ) : (
-                      <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-                        {cat.id === 'knitted' ? (
-                          <>
-                            <rect width="300" height="150" fill={['#1d4a6b', '#255a7d', '#163a55'][i]} />
-                            <rect width="300" height="150" fill="url(#patt-knit)" />
-                          </>
-                        ) : cat.id === 'woven' ? (
-                          <>
-                            <rect width="300" height="150" fill={['#e7ddc8', '#dfcfae', '#d5c9ac'][i]} />
-                            <rect width="300" height="150" fill="url(#patt-woven)" />
-                          </>
-                        ) : (
-                          <>
-                            <rect width="300" height="150" fill={['#f0d5d3', '#e6b7b2', '#d99c9a'][i]} />
-                            <rect width="300" height="150" fill="url(#patt-twill)" />
-                          </>
-                        )}
-                      </svg>
-                    )}
-                    {count > 1 && (
-                      <span class="count-badge">
-                        <span class="i18n-zh" lang="zh-CN">{count} 图</span>
-                        <span class="i18n-en" lang="en">{count} Photos</span>
-                      </span>
-                    )}
-                    <span class="spec-chip">{item.spec}</span>
-                  </div>
-                  <div class="card-body">
-                    <h3>
-                      <span class="i18n-zh" lang="zh-CN">{item.name.zh}</span>
-                      <span class="i18n-en" lang="en">{item.name.en}</span>
-                    </h3>
-                    <p>
-                      <span class="i18n-zh" lang="zh-CN">{item.desc.zh}</span>
-                      <span class="i18n-en" lang="en">{item.desc.en}</span>
-                    </p>
-                  </div>
-                </article>
-              );
-            })}
+            {cards.map((entry, i) => (
+              <ProductCard item={entry.item} lb={entry.lb} index={i} patternKey={group.id} />
+            ))}
           </div>
         </div>
-      ))
-      }
+      ))}
+
+      {/* 配饰：产品平铺 */}
+      {flat && (
+        <div class="product-grid">
+          {flat.map((entry, i) => (
+            <ProductCard item={entry.item} lb={entry.lb} index={i} patternKey={cat.id} />
+          ))}
+        </div>
+      )}
+    </div>
+  ))
+}
 
     <div class="products-cta">
       <span class="lead">

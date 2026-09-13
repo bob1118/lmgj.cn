@@ -8,11 +8,13 @@
  */
 
 /**
- * 产品分类标识：
- * - knitted / woven 为企业确定的两大核心品类；
- * - trend 为「流行新品」分类（2026 新增；分类名称「流行新品/Trending」与中英描述已经企业确认）。
+ * 产品分类（2026 企业调整：由针织/织造/流行新品三分类改为「面料 + 配饰」两分类）：
+ * - fabrics 面料：子分组 knitted 针织 / woven 梭织 / trend 流行新品
+ *   （原三大分类名称与描述已经企业确认，降级为面料子分组后沿用，不重新起草）；
+ * - accessories 配饰：2026 新增板块，子目录=产品（企业素材目录为结构依据，文案 draft 待企业确认）。
  */
-export type ProductCategoryId = 'knitted' | 'woven' | 'trend';
+export type ProductCategoryId = 'fabrics' | 'accessories';
+export type ProductGroupId = 'knitted' | 'woven' | 'trend';
 
 export interface Pair {
   zh: string;
@@ -27,16 +29,30 @@ export interface ProductImage {
 
 export interface ProductItem {
   name: Pair;
-  spec: string;
+  /** 克重/规格；企业未提供时留空，卡片不渲染规格角标 */
+  spec?: string;
   desc: Pair;
   images?: ProductImage[];
+  /** 可选角标（如配饰「流行新品」），渲染于缩略图上 */
+  badge?: Pair;
+}
+
+/** 面料分类下的子分组（分组结构与素材子目录一致） */
+export interface ProductGroup {
+  id: ProductGroupId;
+  name: Pair;
+  desc: Pair;
+  items: ProductItem[];
 }
 
 export interface ProductCategory {
   id: ProductCategoryId;
   name: Pair;
   desc: Pair;
-  items: ProductItem[];
+  /** 面料等有子分组的分类；缺省时直接平铺 items（配饰） */
+  groups?: ProductGroup[];
+  /** 无子分组的分类直接平铺产品（配饰） */
+  items?: ProductItem[];
 }
 
 /** 品牌（企业已确认：中文名 金华莱盟纺织品有限公司，英文名 Jinhua Laimeng Textile Factory） */
@@ -56,15 +72,17 @@ export const nav: { id: string; label: Pair }[] = [
 ];
 
 export const hero = {
-  eyebrow: { zh: '针织 · 织造纺织品进出口', en: 'Knitted & Woven Textiles Import & Export' },
+  // draft：定位由「针织织造」扩为「面料 + 配饰」，待企业确认
+  eyebrow: { zh: '面料 · 服饰配饰进出口', en: 'Fabrics & Accessories Import & Export' },
   // 标题允许少量 <em> 强调标记（由组件 set:html 渲染）
   titleHtml: {
     zh: '莱盟纺织，织造<em>可信赖</em>的全球供应',
     en: 'Woven with <em>Trust</em>, Delivered Worldwide',
   },
+  // draft：描述同步补充配饰板块，待企业确认
   subtitle: {
-    zh: '专注针织与织造纺织品进出口贸易，为国内外采购商提供从选料、打样到大货交付的一站式服务。',
-    en: 'Specialized in knitted and woven textile trading — one-stop service from sourcing and sampling to bulk delivery for buyers worldwide.',
+    zh: '专注面料与服饰配饰进出口贸易，为国内外采购商提供从选料、打样到大货交付的一站式服务。',
+    en: 'Specialized in fabrics and accessories trading — one-stop service from sourcing and sampling to bulk delivery for buyers worldwide.',
   },
   ctaProducts: { zh: '查看产品', en: 'Our Products' },
   ctaContact: { zh: '联系我们', en: 'Contact Us' },
@@ -78,14 +96,15 @@ export const hero = {
 
 export const about = {
   title: { zh: '关于我们', en: 'About Us' },
+  // draft：原文（专注针织与织造纺织品进出口）已经企业确认，扩充配饰后待企业确认
   lead: {
-    zh: '金华莱盟纺织品有限公司是一家专注于针织与织造纺织品进出口的外贸企业，依托中国主要纺织产业带的成熟供应链，为全球采购商提供稳定、优质、高效的面料供应服务。',
-    en: 'Jinhua Laimeng Textile Factory is an import & export company specializing in knitted and woven textiles. Backed by mature supply chains across China\u2019s major textile hubs, we deliver stable, quality-assured fabrics to buyers worldwide.',
+    zh: '金华莱盟纺织品有限公司是一家专注于面料与服饰配饰进出口的外贸企业，依托中国主要纺织产业带的成熟供应链，为全球采购商提供稳定、优质、高效的供应服务。',
+    en: 'Jinhua Laimeng Textile Factory is an import & export company specializing in fabrics and accessories. Backed by mature supply chains across China\u2019s major textile hubs, we deliver stable, quality-assured products to buyers worldwide.',
   },
-  // 企业已确认文案
+  // draft：原文为企业确认文案，扩写配饰后待企业确认
   body: {
-    zh: '我们长期深耕针织、梭织两大品类，熟悉国际市场的品质标准与合规要求，能够快速响应打样、翻单与大货交付需求，成为客户长期信赖的供应链伙伴。',
-    en: 'Focusing on knitted and woven fabrics, we understand international quality standards and compliance requirements, responding quickly to sampling, re-orders and bulk production — a supply chain partner you can rely on for the long term.',
+    zh: '我们长期深耕针织、梭织面料与服饰配饰板块，熟悉国际市场的品质标准与合规要求，能够快速响应打样、翻单与大货交付需求，成为客户长期信赖的供应链伙伴。',
+    en: 'Focusing on knitted, woven fabrics and accessories, we understand international quality standards and compliance requirements, responding quickly to sampling, re-orders and bulk production — a supply chain partner you can rely on for the long term.',
   },
   advantagesTitle: { zh: '核心优势', en: 'Why Choose Us' },
   advantages: [
@@ -121,11 +140,12 @@ export const about = {
 };
 
 /**
- * 为流行新品分类批量生成实拍图列表。
- * 图源：src/assets/products/<slug>-NN.webp（scripts/import-new-products.mjs 一次性导入）。
+ * 为产品批量生成实拍图列表（多图灯箱用）。
+ * 图源：src/assets/products/<slug>-NN.webp（scripts/import-two-categories.mjs 全量导入，
+ * 台账 scripts/import-manifest-two-categories.json；原片目录 images/ gitignore 不入库）。
  * 企业如需逐图定制 alt，可展开为显式列表。
  */
-function trendImages(slug: string, count: number, zhBase: string, enBase: string): ProductImage[] {
+function productPhotos(slug: string, count: number, zhBase: string, enBase: string): ProductImage[] {
   return Array.from({ length: count }, (_, i) => {
     const n = i + 1;
     return {
@@ -134,17 +154,18 @@ function trendImages(slug: string, count: number, zhBase: string, enBase: string
     };
   });
 }
-
-export const products: {  title: Pair;
+export const products: {
+  title: Pair;
   intro: Pair;
   contactLead: Pair;
   contactCta: Pair;
   categories: ProductCategory[];
 } = {
   title: { zh: '产品中心', en: 'Products' },
+  // draft：定位由「两大品类」改为「面料 + 配饰」两分类，待企业确认
   intro: {
-    zh: '聚焦针织与织造两大品类，常年供应主流规格面料；以下为代表产品，更多品类欢迎垂询。',
-    en: 'Focused on two core categories — knitted and woven — with mainstream specifications in regular supply. Representative products below; more available on request.',
+    zh: '聚焦面料与服饰配饰两大板块，涵盖针织、梭织与流行新品面料及配饰产品；以下为代表产品，更多品类欢迎垂询。',
+    en: 'Focused on fabrics and accessories — knitted, woven and trending fabrics alongside trims and beadwork. Representative products below; more available on request.',
   },
   contactLead: {
     zh: '需要完整产品目录或寄送样品？',
@@ -153,208 +174,281 @@ export const products: {  title: Pair;
   contactCta: { zh: '联系我们获取', en: 'Get in Touch' },
   categories: [
     {
-      // 「流行新品」分类（置于首位），分类名称与描述已经企业确认；克重企业已提供（醋酸感丝绒 260–300，压花数码印花/压花石纹 240–300，多花型 220–300，仿真丝绒压花/印花 240–280 gsm）。
-      // 产品名称来自企业素材文件夹（原片 images/new/ 64 张已压缩为 webp 入库，见 scripts/import-new-products.mjs / import-manifest.json；原片目录已清理）。
-      id: 'trend',
-      name: { zh: '流行新品', en: 'Trending' },
+      // 面料：子分组结构对应素材目录 images/fabrics/{knitted,woven,Trend}，各产品的子文件夹见台账
+      id: 'fabrics',
+      // draft：分类名与描述为两分类调整后的新定位，待企业确认
+      name: { zh: '面料', en: 'Fabrics' },
       desc: {
-        zh: '聚焦今年流行款式与色彩方向，紧跟国际时尚趋势提供应季新品面料。',
-        en: 'Curated around this year\u2019s trending styles and color directions — in-season new fabrics following international fashion trends.',
+        zh: '涵盖针织、梭织与流行新品三大类面料，常年供应主流规格，支持打样与大货定制。',
+        en: 'Knitted, woven and trending fabrics in mainstream specifications — sampling and bulk production on request.',
       },
-      items: [
+      groups: [
         {
-          name: { zh: '醋酸感丝绒', en: 'Acetate-Feel Velvet' },
-          spec: '260–300 gsm',
+          // 「流行新品」名称与描述已经企业确认，降级为面料子分组沿用；克重企业已提供（醋酸感丝绒 260–300，压花数码印花/压花石纹 240–300，多花型 220–300，仿真丝绒压花/印花 240–280 gsm）。
+          // 产品名称来自企业素材文件夹（原片 images/fabrics/Trend/ 6 组 64 张重新压缩入库）。
+          id: 'trend',
+          name: { zh: '流行新品', en: 'Trending' },
           desc: {
-            zh: '垂坠丝滑、光泽柔和，连衣裙与外套的应季新品面料。',
-            en: 'Fluid drape with a soft sheen — a seasonal new fabric for dresses and coats.',
+            zh: '聚焦今年流行款式与色彩方向，紧跟国际时尚趋势提供应季新品面料。',
+            en: 'Curated around this year\u2019s trending styles and color directions — in-season new fabrics following international fashion trends.',
           },
-          // 实拍图：企业已提供（企业实拍，8 张，经 scripts/import-new-products.mjs 压缩入库）
-          images: trendImages('acetate-velvet', 8, '醋酸感丝绒', 'Acetate-feel velvet'),
+          items: [
+            {
+              name: { zh: '醋酸感丝绒', en: 'Acetate-Feel Velvet' },
+              spec: '260–300 gsm',
+              desc: {
+                zh: '垂坠丝滑、光泽柔和，连衣裙与外套的应季新品面料。',
+                en: 'Fluid drape with a soft sheen — a seasonal new fabric for dresses and coats.',
+              },
+              // 实拍图：企业已提供（企业实拍 8 张）
+              images: productPhotos('acetate-velvet', 8, '醋酸感丝绒', 'Acetate-feel velvet'),
+            },
+            {
+              name: { zh: '醋酸感丝绒 · 压花数码印花', en: 'Acetate-Feel Velvet Emboss, Digital Print' },
+              spec: '240–300 gsm',
+              desc: {
+                zh: '数码印花花型与压花绒面结合，图案立体、层次分明。',
+                en: 'Digital-print motifs on embossed velvet — dimensional patterns with clear depth.',
+              },
+              // 实拍图：企业已提供（企业实拍 8 张）
+              images: productPhotos('acetate-velvet-digital-print', 8, '醋酸感丝绒压花数码印花', 'Acetate-feel velvet emboss digital print'),
+            },
+            {
+              name: { zh: '醋酸感丝绒 · 压花石纹', en: 'Acetate-Feel Velvet Stone Emboss' },
+              spec: '240–300 gsm',
+              desc: {
+                zh: '石纹肌理压花，手感立体、光泽内敛，呈现自然质感。',
+                en: 'Stone-texture embossed velvet — dimensional hand-feel with a subtle, natural sheen.',
+              },
+              // 实拍图：企业已提供（企业实拍 8 张）
+              images: productPhotos('acetate-velvet-stone', 8, '醋酸感丝绒压花石纹', 'Acetate-feel velvet stone emboss'),
+            },
+            {
+              name: { zh: '醋酸感丝绒 · 多花型', en: 'Acetate-Feel Velvet, Multi-Design' },
+              spec: '220–300 gsm',
+              desc: {
+                zh: '一个绒底承载多组花型，可按服饰款式灵活选配。',
+                en: 'One velvet base carrying multiple designs — flexible matching by apparel style.',
+              },
+              // 实拍图：企业已提供（企业实拍 8 张）
+              images: productPhotos('acetate-velvet-multi-design', 8, '醋酸感丝绒多花型', 'Acetate-feel velvet multi-design'),
+            },
+            {
+              name: { zh: '仿真丝绒 · 压花', en: 'Silk-Feel Velvet Emboss' },
+              spec: '240–280 gsm',
+              desc: {
+                zh: '仿真丝光泽的绒面压花，价格亲民、质感高级。',
+                en: 'Silk-look velvet with embossed texture — accessible pricing with a premium feel.',
+              },
+              // 实拍图：企业已提供（企业实拍 16 张）
+              images: productPhotos('copy-silk-velvet-emboss', 16, '仿真丝绒压花', 'Silk-feel velvet emboss'),
+            },
+            {
+              name: { zh: '仿真丝绒 · 印花', en: 'Silk-Feel Velvet Print' },
+              spec: '240–280 gsm',
+              desc: {
+                zh: '绒面印花花型清透、光泽柔和，适合连衣裙与家居用途。',
+                en: 'Clear printed motifs on a soft-sheen pile — for dresses and home applications.',
+              },
+              // 实拍图：企业已提供（企业实拍 16 张）
+              images: productPhotos('copy-silk-velvet-print', 16, '仿真丝绒印花', 'Silk-feel velvet print'),
+            },
+          ],
         },
         {
-          name: { zh: '醋酸感丝绒 · 压花数码印花', en: 'Acetate-Feel Velvet Emboss, Digital Print' },
-          spec: '240–300 gsm',
+          // 子分组名称/描述沿用原企业确认文案；结构对应 images/fabrics/knitted/{Jersey,Rib,Terry}
+          id: 'knitted',
+          name: { zh: '针织面料', en: 'Knitted Fabrics' },
           desc: {
-            zh: '数码印花花型与压花绒面结合，图案立体、层次分明。',
-            en: 'Digital-print motifs on embossed velvet — dimensional patterns with clear depth.',
+            zh: '手感柔软、弹性良好，广泛用于 T 恤、运动服与内衣。',
+            en: 'Soft hand-feel with natural stretch — widely used for T-shirts, activewear and underwear.',
           },
-          // 实拍图：企业已提供（企业实拍，压花数码印花 8 张，经 scripts/import-new-products.mjs 压缩入库）
-          images: trendImages('acetate-velvet-digital-print', 8, '醋酸感丝绒压花数码印花', 'Acetate-feel velvet emboss digital print'),
+          items: [
+            {
+              name: { zh: '汗布', en: 'Single Jersey' },
+              spec: '100–220 g/m²',
+              desc: {
+                zh: '透气亲肤，T 恤与居家服经典面料。',
+                en: 'Breathable & skin-friendly, a classic for T-shirts and loungewear.',
+              },
+              // 实拍图：企业已提供（Jersey 2 张，经 scripts/import-two-categories.mjs 压缩入库；Jersey1500 型号对应见台账）
+              images: [
+                {
+                  src: '/images/products/jersey-01.webp',
+                  alt: { zh: '汗布实拍图一', en: 'Single jersey fabric view 1' },
+                },
+                {
+                  src: '/images/products/jersey-02.webp',
+                  alt: { zh: '汗布实拍图二', en: 'Single jersey fabric view 2' },
+                },
+              ],
+            },
+            {
+              name: { zh: '罗纹', en: 'Rib Fabric' },
+              spec: '150–300 g/m²',
+              desc: {
+                zh: '弹性足、回弹好，用于领口袖口与修身款。',
+                en: 'High stretch & recovery, for collars, cuffs and fitted styles.',
+              },
+              // 实拍图：企业已提供（Rib 2 张）
+              images: [
+                {
+                  src: '/images/products/rib-01.webp',
+                  alt: { zh: '罗纹实拍图一', en: 'Rib fabric view 1' },
+                },
+                {
+                  src: '/images/products/rib-02.webp',
+                  alt: { zh: '罗纹实拍图二', en: 'Rib fabric view 2' },
+                },
+              ],
+            },
+            {
+              name: { zh: '毛圈布', en: 'French Terry' },
+              spec: '200–350 g/m²',
+              desc: {
+                zh: '柔软吸汗，卫衣帽衫常用面料。',
+                en: 'Soft and absorbent, the go-to fabric for hoodies and sweatshirts.',
+              },
+              // 实拍图：企业已提供（Terry 2 张）
+              images: [
+                {
+                  src: '/images/products/terry-01.webp',
+                  alt: { zh: '毛圈布实拍图一', en: 'French terry fabric view 1' },
+                },
+                {
+                  src: '/images/products/terry-02.webp',
+                  alt: { zh: '毛圈布实拍图二', en: 'French terry fabric view 2' },
+                },
+              ],
+            },
+          ],
         },
         {
-          name: { zh: '醋酸感丝绒 · 压花石纹', en: 'Acetate-Feel Velvet Stone Emboss' },
-          spec: '240–300 gsm',
+          // 子分组沿用原企业确认文案；结构对应 images/fabrics/woven/{Oxford,Poplin,twill}
+          id: 'woven',
+          name: { zh: '梭织面料', en: 'Woven Fabrics' },
           desc: {
-            zh: '石纹肌理压花，手感立体、光泽内敛，呈现自然质感。',
-            en: 'Stone-texture embossed velvet — dimensional hand-feel with a subtle, natural sheen.',
+            zh: '结构挺括、结实耐久，适用于衬衫、工装与家纺。',
+            en: 'Crisp, structured and durable — for shirts, workwear and home textiles.',
           },
-          // 实拍图：企业已提供（企业实拍，压花石纹 8 张，经 scripts/import-new-products.mjs 压缩入库）
-          images: trendImages('acetate-velvet-stone', 8, '醋酸感丝绒压花石纹', 'Acetate-feel velvet stone emboss'),
-        },
-        {
-          name: { zh: '醋酸感丝绒 · 多花型', en: 'Acetate-Feel Velvet, Multi-Design' },
-          spec: '220–300 gsm',
-          desc: {
-            zh: '一个绒底承载多组花型，可按服饰款式灵活选配。',
-            en: 'One velvet base carrying multiple designs — flexible matching by apparel style.',
-          },
-          // 实拍图：企业已提供（企业实拍，多花型 8 张，经 scripts/import-new-products.mjs 压缩入库）
-          images: trendImages('acetate-velvet-multi-design', 8, '醋酸感丝绒多花型', 'Acetate-feel velvet multi-design'),
-        },
-        {
-          name: { zh: '仿真丝绒 · 压花', en: 'Silk-Feel Velvet Emboss' },
-          spec: '240–280 gsm',
-          desc: {
-            zh: '仿真丝光泽的绒面压花，价格亲民、质感高级。',
-            en: 'Silk-look velvet with embossed texture — accessible pricing with a premium feel.',
-          },
-          // 实拍图：企业已提供（企业实拍，16 张，经 scripts/import-new-products.mjs 压缩入库）
-          images: trendImages('copy-silk-velvet-emboss', 16, '仿真丝绒压花', 'Silk-feel velvet emboss'),
-        },
-        {
-          name: { zh: '仿真丝绒 · 印花', en: 'Silk-Feel Velvet Print' },
-          spec: '240–280 gsm',
-          desc: {
-            zh: '绒面印花花型清透、光泽柔和，适合连衣裙与家居用途。',
-            en: 'Clear printed motifs on a soft-sheen pile — for dresses and home applications.',
-          },
-          // 实拍图：企业已提供（企业实拍，16 张，经 scripts/import-new-products.mjs 压缩入库）
-          images: trendImages('copy-silk-velvet-print', 16, '仿真丝绒印花', 'Silk-feel velvet print'),
+          items: [
+            {
+              name: { zh: '府绸', en: 'Poplin' },
+              spec: '100–160 g/m²',
+              desc: {
+                zh: '细洁平滑、手感爽挺，经典衬衫面料。',
+                en: 'Fine, smooth and crisp — a classic shirting fabric.',
+              },
+              // 实拍图：企业已提供（Poplin 2 张）
+              images: [
+                {
+                  src: '/images/products/poplin-01.webp',
+                  alt: { zh: '府绸实拍图一', en: 'Poplin fabric view 1' },
+                },
+                {
+                  src: '/images/products/poplin-02.webp',
+                  alt: { zh: '府绸实拍图二', en: 'Poplin fabric view 2' },
+                },
+              ],
+            },
+            {
+              name: { zh: '纱卡 / 斜纹', en: 'Twill / Drill' },
+              spec: '200–350 g/m²',
+              desc: {
+                zh: '结实耐磨，工装裤装首选面料。',
+                en: 'Strong and abrasion-resistant, first choice for workwear and trousers.',
+              },
+              // 实拍图：企业已提供（twill 2 张）
+              images: [
+                {
+                  src: '/images/products/twill-01.webp',
+                  alt: { zh: '斜纹布实拍图一', en: 'Twill fabric view 1' },
+                },
+                {
+                  src: '/images/products/twill-02.webp',
+                  alt: { zh: '斜纹布实拍图二', en: 'Twill fabric view 2' },
+                },
+              ],
+            },
+            {
+              name: { zh: '牛津布', en: 'Oxford' },
+              spec: '150–300 g/m²',
+              desc: {
+                zh: '挺括耐用，箱包、休闲服饰与家纺适用。',
+                en: 'Sturdy and durable, for bags, casual wear and home textiles.',
+              },
+              // 实拍图：企业已提供（Oxford 2 张）
+              images: [
+                {
+                  src: '/images/products/oxford-01.webp',
+                  alt: { zh: '牛津布实拍图一', en: 'Oxford fabric view 1' },
+                },
+                {
+                  src: '/images/products/oxford-02.webp',
+                  alt: { zh: '牛津布实拍图二', en: 'Oxford fabric view 2' },
+                },
+              ],
+            },
+          ],
         },
       ],
     },
     {
-      id: 'knitted',
-      name: { zh: '针织纺织品', en: 'Knitted Textiles' },
+      // 配饰：结构对应素材目录 images/accessories 五个子文件夹，每个子文件夹 = 一款产品
+      // draft：以下全部中英文命名与描述为按目录直译起草，待企业确认
+      id: 'accessories',
+      name: { zh: '配饰', en: 'Accessories' },
       desc: {
-        zh: '手感柔软、弹性良好，广泛用于 T 恤、运动服与内衣。',
-        en: 'Soft hand-feel with natural stretch — widely used for T-shirts, activewear and underwear.',
+        zh: '涵盖串珠、珍珠、水钻到女装配饰的全品类珠饰与辅料，可按款式与配色定制。',
+        en: 'Full-range beadwork and trims — from bugle, pearl and rhinestone beads to women\u2019s accessories, customizable by style and colorway.',
       },
       items: [
         {
-          name: { zh: '汗布', en: 'Single Jersey' },
-          spec: '100–220 g/m²',
+          name: { zh: '流行饰品', en: 'Trending Accessories' },
+          // badge：角标文案，渲染于产品缩略图上；企业要求置于配饰首位
+          badge: { zh: '流行新品', en: 'New & Trending' },
           desc: {
-            zh: '透气亲肤，T 恤与居家服经典面料。',
-            en: 'Breathable & skin-friendly, a classic for T-shirts and loungewear.',
+            zh: '紧贴本季流行趋势的配饰单品，新款持续更新，欢迎垂询。',
+            en: 'Accessory styles following this season\u2019s trends — new arrivals updated regularly.',
           },
-          // 实拍图：企业已提供（企业实拍，压缩入库）
-          images: [
-            {
-              src: '/images/products/jersey-1.jpg',
-              alt: { zh: '汗布实拍图一', en: 'Single jersey fabric view 1' },
-            },
-            {
-              src: '/images/products/jersey-2.jpg',
-              alt: { zh: '汗布实拍图二', en: 'Single jersey fabric view 2' },
-            },
-          ],
+          // 实拍图：企业已提供（企业实拍 8 张）
+          images: productPhotos('accessories-trend', 8, '流行饰品', 'Trending accessories'),
         },
         {
-          name: { zh: '罗纹', en: 'Rib Fabric' },
-          spec: '150–300 g/m²',
+          name: { zh: '串珠管珠', en: 'Bugle Beads' },
           desc: {
-            zh: '弹性足、回弹好，用于领口袖口与修身款。',
-            en: 'High stretch & recovery, for collars, cuffs and fitted styles.',
+            zh: '细长管形珠饰，点缀礼服、针织与箱包配饰。',
+            en: 'Slender tube-shaped beads for gowns, knitwear and bag accents.',
           },
-          // 实拍图：企业已提供（企业实拍，压缩入库）
-          images: [
-            {
-              src: '/images/products/rib-1.jpg',
-              alt: { zh: '罗纹实拍图一', en: 'Rib fabric view 1' },
-            },
-            {
-              src: '/images/products/rib-2.jpg',
-              alt: { zh: '罗纹实拍图二', en: 'Rib fabric view 2' },
-            },
-          ],
+          // 实拍图：企业已提供（企业实拍 4 张，原片为 hash 文件名，台账可溯源）
+          images: productPhotos('bugle-beads', 4, '串珠管珠', 'Bugle beads'),
         },
         {
-          name: { zh: '毛圈布', en: 'French Terry' },
-          spec: '200–350 g/m²',
+          name: { zh: '工艺珍珠', en: 'Craft Pearl Beads' },
           desc: {
-            zh: '柔软吸汗，卫衣帽衫常用面料。',
-            en: 'Soft and absorbent, the go-to fabric for hoodies and sweatshirts.',
+            zh: '珠面圆润、光泽柔和，适合女装与礼服的细节点缀。',
+            en: 'Round pearls with a soft sheen — refined accents for women\u2019s wear and gowns.',
           },
-          // 实拍图：企业已提供（企业实拍，压缩入库）
-          images: [
-            {
-              src: '/images/products/terry-1.jpg',
-              alt: { zh: '毛圈布实拍图一', en: 'French terry fabric view 1' },
-            },
-            {
-              src: '/images/products/terry-2.jpg',
-              alt: { zh: '毛圈布实拍图二', en: 'French terry fabric view 2' },
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'woven',
-      name: { zh: '织造纺织品', en: 'Woven Textiles' },
-      desc: {
-        zh: '结构挺括、结实耐久，适用于衬衫、工装与家纺。',
-        en: 'Crisp, structured and durable — for shirts, workwear and home textiles.',
-      },
-      items: [
-        {
-          name: { zh: '府绸', en: 'Poplin' },
-          spec: '100–160 g/m²',
-          desc: {
-            zh: '细洁平滑、手感爽挺，经典衬衫面料。',
-            en: 'Fine, smooth and crisp — a classic shirting fabric.',
-          },
-          // 实拍图：企业已提供（企业实拍，压缩入库）
-          images: [
-            {
-              src: '/images/products/poplin-1.jpg',
-              alt: { zh: '府绸实拍图一', en: 'Poplin fabric view 1' },
-            },
-            {
-              src: '/images/products/poplin-2.jpg',
-              alt: { zh: '府绸实拍图二', en: 'Poplin fabric view 2' },
-            },
-          ],
+          // 实拍图：企业已提供（企业实拍 3 张）
+          images: productPhotos('craft-pearl-beads', 3, '工艺珍珠', 'Craft pearl beads'),
         },
         {
-          name: { zh: '纱卡 / 斜纹', en: 'Twill / Drill' },
-          spec: '200–350 g/m²',
+          name: { zh: '水钻珠', en: 'Rhinestone Beads' },
           desc: {
-            zh: '结实耐磨，工装裤装首选面料。',
-            en: 'Strong and abrasion-resistant, first choice for workwear and trousers.',
+            zh: '高折射水晶质感，为高级定制与舞台服饰增亮。',
+            en: 'High-refraction crystal sparkle for couture and stage wear.',
           },
-          // 实拍图：企业已提供（企业实拍，压缩入库）
-          images: [
-            {
-              src: '/images/products/twill-1.jpg',
-              alt: { zh: '斜纹布实拍图一', en: 'Twill fabric view 1' },
-            },
-            {
-              src: '/images/products/twill-2.jpg',
-              alt: { zh: '斜纹布实拍图二', en: 'Twill fabric view 2' },
-            },
-          ],
+          // 实拍图：企业已提供（企业实拍 2 张）
+          images: productPhotos('rhinestone-beads', 2, '水钻珠', 'Rhinestone beads'),
         },
         {
-          name: { zh: '牛津布', en: 'Oxford' },
-          spec: '150–300 g/m²',
+          name: { zh: '女装配饰', en: 'Women\u2019s Accessories' },
           desc: {
-            zh: '挺括耐用，箱包、休闲服饰与家纺适用。',
-            en: 'Sturdy and durable, for bags, casual wear and home textiles.',
+            zh: '女装配套珠饰与装饰件，可按款式与配色定制。',
+            en: 'Matching beadwork and trims for women\u2019s wear — customizable by style and colorway.',
           },
-          // 实拍图：企业已提供（企业实拍，压缩入库）
-          images: [
-            {
-              src: '/images/products/oxford-1.jpg',
-              alt: { zh: '牛津布实拍图一', en: 'Oxford fabric view 1' },
-            },
-            {
-              src: '/images/products/oxford-2.jpg',
-              alt: { zh: '牛津布实拍图二', en: 'Oxford fabric view 2' },
-            },
-          ],
+          // 实拍图：企业已提供（企业实拍 3 张）
+          images: productPhotos('women-accessories', 3, '女装配饰', 'Women\u2019s accessories'),
         },
       ],
     },
@@ -464,9 +558,10 @@ export const contact = {
 };
 
 export const footer = {
+  // draft：定位同步补充配饰板块，待企业确认
   tagline: {
-    zh: '针织与织造纺织品进出口 · 面向全球的可靠供应',
-    en: 'Knitted & woven textiles import and export — reliable supply for the world.',
+    zh: '面料与服饰配饰进出口 · 面向全球的可靠供应',
+    en: 'Fabrics & accessories import and export — reliable supply for the world.',
   },
   navTitle: { zh: '快速导航', en: 'Quick Links' },
   contactTitle: { zh: '联系方式', en: 'Contact' },

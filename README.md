@@ -1,6 +1,6 @@
 # lmgj.cn
 
-中英双语单页企业站（Astro 5 静态输出）。需求依据见 `需求文档.md`。
+中英双语单页企业站（Astro 7 静态输出）。需求依据见 `需求文档.md`。
 
 ## 常用命令
 
@@ -22,27 +22,30 @@ src/
 │   ├── hero-bg.jpg        # 首屏背景（织造车间实拍，压缩副本）
 │   ├── og-image.jpg       # 1200×630 社交分享图（scripts/make-brand-assets.mjs 生成）
 │   ├── favicon-32.png / apple-touch-icon.png   # 图标（同上生成）
-│   ├── products/          # 产品实拍图（jersey-1.jpg 等 + 流行新品丝绒 64 张 webp）
+│   ├── products/          # 产品实拍图（面料 12 张 jpg + 流行新品/配饰 webp，经 import-two-categories 统一为 webp）
 │   └── company/           # 车间/证书/设备/品控/市场图（workshop.jpg、business-license.jpg 等）
 ├── lib/images.ts          # 图片解析 helper（文件名 → 构建资产；灯箱列表）
 ├── layouts/Layout.astro   # 页头 Meta/SEO、共享织物纹样、灯箱与交互脚本
-├── components/            # Header / Hero / About / Products / Strength / Contact / Footer
-├── styles/global.css      # 设计系统（品牌青绿 + 亚麻底 + 织纹肌理；品类双色：针织靛蓝/织造青绿/流行新品粉调）
+├── components/            # Header / Hero / About / Products / ProductCard / Strength / Contact / Footer
+├── styles/global.css      # 设计系统（品牌青绿 + 亚麻底 + 织纹肌理；品类变量：织物子分类 + 配饰）
 └── pages/index.astro      # 单页组装
 public/
 └── robots.txt             # 爬虫规则（sitemap 由 @astrojs/sitemap 构建时生成）
 scripts/
 ├── make-brand-assets.mjs  # 生成 og 分享图 / favicon / touch icon（sharp）
-├── import-new-products.mjs # 流行新品 64 张实拍导入（源片在本地 images/new/，gitignore 不入库；统一顺时针 rotate 90° 输出横版，重跑可复现）
-├── import-manifest.json   # 上项导入的源片 ↔ 产物对应台账
+├── import-two-categories.mjs # 面料 + 配饰产品全量导入（96 张，源片本地 images/fabrics 与 images/accessories，gitignore 不入库；1920px/Q75 webp）
+├── import-manifest-two-categories.json # 上项导入的源片 ↔ 产物对应台账
+├── import-new-products.mjs  # （留档）三分类时代的流行新品 64 张导入，已被上项取代
+├── import-manifest.json     # （留档）旧脚本台账
 └── convert-heic.mjs       # HEIC 素材转 JPG（企业 iPhone 原图用）
 ```
 
 ## 内容维护
 
 - **改文案**：只改 `src/data/content.ts`，所有字段中英成对（`Pair`），改中文时同步改英文。
-- **换/加图片**：把 JPG/PNG 放进 `src/assets/products/` 或 `src/assets/company/`（ASCII 文件名），在 `content.ts` 对应位置登记同名字路径（如 `/images/products/jersey-1.jpg`，`lib/images.ts` 按文件名匹配，路径仅作 key 用途）。批量实拍导入用 `scripts/import-new-products.mjs`（源片本地 `images/new/`，gitignore 内不入库）。
-- **切语言行为**：默认中文；`html[data-lang]` 控制成对 span 显隐，切换时同步 `document.title`、meta description 与图片 alt。
+- **换/加图片**：把 JPG/PNG 放进 `src/assets/products/` 或 `src/assets/company/`（ASCII 文件名），在 `content.ts` 对应位置登记同名字路径（如 `/images/products/jersey-01.webp`，`lib/images.ts` 按文件名匹配，路径仅作 key 用途）。批量实拍导入用 `scripts/import-two-categories.mjs`（源片本地 `images/fabrics/` 与 `images/accessories/`，gitignore 内不入库，重跑幂等）。
+- **产品结构**：两分类同位页签——产品区顶部「面料 / 配饰」页签点击切换（英文定稿 Fabrics / Accessories；默认面料，非当前区块隐藏）；面料 `fabrics` 子分组显示顺序：trend 流行新品 → knitted 针织 → woven 梭织（woven 中文定稿为「梭织」），配饰 `accessories` 平铺 5 款（Trending Accessories 置于首位）；面料子分组文案沿用企业确认稿，配饰 5 款与全局定位文案为 draft 待企业确认。
+- **切语言行为**：默认语言跟随浏览器（非 zh 开头 → 英文），用户点过中/EN 按钮则以 localStorage 记录优先；`html[data-lang]` 控制成对 span 显隐，切换时同步 `document.title`、meta description 与图片 alt。
 - **产品图灯箱**：卡片带 `data-lb-images` 属性，点击进灯箱（键盘 ←/→ 切换、Esc 关闭），逻辑在 `Layout.astro` 尾部脚本。
 - **品牌资产重生成**：替换 logo 或产品主图后重跑 `node scripts/make-brand-assets.mjs`。
 

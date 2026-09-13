@@ -1,0 +1,85 @@
+---
+// 产品卡：主图（点击进灯箱）+ 图数角标 + 流行新品角标 + 规格角标（空则不渲染）+ 名称与描述
+import { Image } from 'astro:assets';
+import type { ProductImage, ProductItem } from '../data/content';
+import { assetImage } from '../lib/images';
+
+interface Props {
+  item: ProductItem;
+  lb: { src: string; altZh: string; altEn: string }[];
+  /** 品类/子分组 id，用于占位纹样与取色 */
+  patternKey: string;
+  index: number;
+}
+
+const { item, lb, patternKey, index } = Astro.props;
+const main: ProductImage | undefined = item.images?.[0];
+const count = lb.length;
+
+/** 无图时的占位（品类变量取色 + 共享纹样，勿硬编码色值） */
+const PLACEHOLDER: Record<string, { color: string; pattern: string }> = {
+  fabrics: { color: 'var(--cat-woven)', pattern: 'patt-woven' },
+  accessories: { color: 'var(--cat-accessories)', pattern: 'patt-beads' },
+  knitted: { color: 'var(--cat-knitted)', pattern: 'patt-knit' },
+  woven: { color: 'var(--cat-woven)', pattern: 'patt-woven' },
+  trend: { color: 'var(--cat-trend-deep)', pattern: 'patt-twill' },
+};
+const ph = PLACEHOLDER[patternKey] ?? PLACEHOLDER.fabrics;
+---
+
+<article class="product-card">
+  <div class="thumb">
+    {
+      main ? (
+        <a
+          class="thumb-main"
+          href={lb[0]?.src ?? main.src}
+          title={[lb[0]?.altZh, lb[0]?.altEn].filter(Boolean).join(' / ')}
+          data-lb-images={JSON.stringify(lb)}
+          data-lb-index="0"
+        >
+          <Image
+            src={assetImage(main.src)}
+            alt={lb[0]?.altZh ?? ''}
+            data-alt-zh={lb[0]?.altZh}
+            data-alt-en={lb[0]?.altEn}
+            width={640}
+            height={320}
+            widths={[480, 640, 960]}
+            sizes="(max-width: 860px) 100vw, 340px"
+            loading="lazy"
+            decoding="async"
+          />
+        </a>
+      ) : (
+        <svg viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="300" height="150" fill={ph.color} opacity={[1, 0.85, 0.7][index % 3]} />
+          <rect width="300" height="150" fill={`url(#${ph.pattern})`} />
+        </svg>
+      )
+    }
+    {item.badge && (
+      <span class="trend-chip">
+        <span class="i18n-zh" lang="zh-CN">{item.badge.zh}</span>
+        <span class="i18n-en" lang="en">{item.badge.en}</span>
+      </span>
+    )}
+    {count > 1 && (
+      <span class="count-badge">
+        <span class="i18n-zh" lang="zh-CN">{count} 图</span>
+        <span class="i18n-en" lang="en">{count} Photos</span>
+      </span>
+    )}
+    {item.spec && <span class="spec-chip">{item.spec}</span>}
+  </div>
+  <div class="card-body">
+    <h3>
+      <span class="i18n-zh" lang="zh-CN">{item.name.zh}</span>
+      <span class="i18n-en" lang="en">{item.name.en}</span>
+    </h3>
+    <p>
+      <span class="i18n-zh" lang="zh-CN">{item.desc.zh}</span>
+      <span class="i18n-en" lang="en">{item.desc.en}</span>
+    </p>
+  </div>
+</article>

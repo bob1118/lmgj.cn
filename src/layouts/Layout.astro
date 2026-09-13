@@ -88,7 +88,7 @@ const orgJsonLd = {
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="金华莱盟纺织品有限公司 — 针织与织造纺织品 Jinhua Laimeng Textile Factory — Knitted & Woven Textiles"
+      content="金华莱盟纺织品有限公司 — 面料与服饰配饰进出口 Jinhua Laimeng Textile Factory — Fabrics &amp; Accessories"
     />
     <meta property="og:locale" content="zh_CN" />
     <meta property="og:locale:alternate" content="en_US" />
@@ -147,6 +147,11 @@ const orgJsonLd = {
         {/* 斜纹纹 */}
         <pattern id="patt-twill" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
           <rect width="3" height="10" fill="rgba(255,255,255,0.10)"></rect>
+        </pattern>
+        {/* 串珠圆点纹（配饰品类） */}
+        <pattern id="patt-beads" width="16" height="16" patternUnits="userSpaceOnUse">
+          <circle cx="4" cy="4" r="2.4" fill="rgba(255,255,255,0.18)"></circle>
+          <circle cx="12" cy="12" r="2.4" fill="rgba(255,255,255,0.10)"></circle>
         </pattern>
       </defs>
     </svg>
@@ -380,6 +385,43 @@ const orgJsonLd = {
           if (first?.src) new Image().src = first.src;
         } catch {}
       }, true); // 捕获阶段：pointerenter 不冒泡，但 closest 委托需能收到子元素进入
+
+      // ---------- 产品中心分类页签：同一位置在面料/配饰间切换（ARIA tab + 键盘方向键） ----------
+      const catTabs = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-cat-tab]'));
+      const catPanels = Array.from(document.querySelectorAll<HTMLElement>('.products .category'));
+      const pickTab = (tab: HTMLButtonElement) => {
+        const target = tab.dataset.catTab ?? '';
+        catTabs.forEach((b) => {
+          b.classList.toggle('is-active', b === tab);
+          b.setAttribute('aria-selected', String(b === tab));
+          b.tabIndex = b === tab ? 0 : -1; // roving tabindex：仅当前页签可 Tab 到
+        });
+        catPanels.forEach((panel) => {
+          panel.classList.toggle('is-hidden', panel.id !== `cat-${target}`);
+        });
+      };
+      catTabs.forEach((btn, idx) => {
+        btn.addEventListener('click', () => pickTab(btn));
+        // 键盘：←/→ 在页签间移动并激活，Home/End 跳首尾（WAI-ARIA tabs 模式）
+        btn.addEventListener('keydown', (e) => {
+          const move = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+          if (move !== 0) {
+            const next = catTabs[(idx + move + catTabs.length) % catTabs.length];
+            if (next) {
+              e.preventDefault();
+              pickTab(next);
+              next.focus();
+            }
+          } else if (e.key === 'Home' || e.key === 'End') {
+            e.preventDefault();
+            const next = e.key === 'Home' ? catTabs[0] : catTabs[catTabs.length - 1];
+            if (next) {
+              pickTab(next);
+              next.focus();
+            }
+          }
+        });
+      });
 
       // ---------- 移动端菜单开合（含 Esc / 外部点击关闭） ----------
       const navToggle = document.getElementById('nav-toggle');

@@ -8,8 +8,8 @@ import sharp from 'sharp';
 
 const jobs = [
   {
-    // 分享图：取汗布实拍图裁切，叠品牌青绿遮罩 + 织纹边框
-    input: 'src/assets/products/jersey-1.jpg',
+    // 分享图：取流行新品丝绒实拍图裁切（两分类定版后与产品区主推一致），叠品牌青绿遮罩 + 织纹边框
+    input: 'src/assets/products/acetate-velvet-01.webp',
     output: 'src/assets/og-image.jpg',
     build: (pipeline) =>
       pipeline
